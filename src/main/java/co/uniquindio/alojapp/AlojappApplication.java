@@ -1,4 +1,4 @@
-package co.uniquindio.Alojapp;
+package co.uniquindio.alojapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
