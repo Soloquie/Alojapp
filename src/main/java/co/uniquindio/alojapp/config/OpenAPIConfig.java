@@ -25,7 +25,6 @@ public class OpenAPIConfig {
                                         .bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
 
-                // 📝 Información general de la API
                 .info(new Info()
                         .title("API de Alojapp")
                         .version("1.0.0")

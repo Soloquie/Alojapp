@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,84 +17,82 @@ import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/reservas")
-@Tag(name = "Reservas", description = "Operaciones relacionadas con la gestión de reservas de huéspedes y anfitriones")
+@Tag(name = "Reservas", description = "Gestión de reservas de alojamientos")
 @SecurityRequirement(name = "bearerAuth")
 public class ReservaController {
 
-    // ===== DTOs simulados para ejemplos =====
+    // ===== DTOs simulados =====
+    static class ReservaRequest {
+        @Schema(example = "15") public String alojamientoId;
+        @Schema(example = "2025-10-01") public String fechaInicio;
+        @Schema(example = "2025-10-05") public String fechaFin;
+    }
+
     static class ReservaResponse {
-        @Schema(example = "25")
-        public String id;
-        @Schema(example = "15")
-        public String alojamientoId;
-        @Schema(example = "usuario@correo.com")
-        public String usuarioEmail;
-        @Schema(example = "2025-09-20")
-        public String fechaInicio;
-        @Schema(example = "2025-09-25")
-        public String fechaFin;
-        @Schema(example = "Pendiente")
-        public String estado;
+        @Schema(example = "500") public String id;
+        @Schema(example = "15") public String alojamientoId;
+        @Schema(example = "juan@correo.com") public String huespedEmail;
+        @Schema(example = "2025-10-01") public String fechaInicio;
+        @Schema(example = "2025-10-05") public String fechaFin;
+        @Schema(example = "CONFIRMADA") public String estado;
+        @Schema(example = "1500000") public double total;
+    }
+
+    static class PagoResponse {
+        @Schema(example = "9001") public String idPago;
+        @Schema(example = "500") public String reservaId;
+        @Schema(example = "1500000") public double monto;
+        @Schema(example = "APROBADO") public String estadoPago;
+        @Schema(example = "2025-09-20") public String fecha;
     }
 
     // =========================
     // ENDPOINT 1: POST /api/reservas
     // =========================
     @PostMapping
-    @Operation(
-            summary = "Crear nueva reserva",
-            description = "Permite a un huésped crear una reserva para un alojamiento disponible"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Reserva creada correctamente",
-                    content = @Content(
-                            mediaType = "application/json",
+    @Operation(summary = "Crear nueva reserva",
+            description = "Permite a un huésped reservar un alojamiento en unas fechas específicas")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Reserva creada correctamente",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ReservaResponse.class),
                             examples = @ExampleObject(
-                                    value = "{ \"id\": \"25\", \"alojamientoId\": \"15\", \"usuarioEmail\": \"usuario@correo.com\", \"fechaInicio\": \"2025-09-20\", \"fechaFin\": \"2025-09-25\", \"estado\": \"Pendiente\" }"
-                            )
-                    )
-            ),
+                                    value = "{ \"id\": \"500\", \"alojamientoId\": \"15\", \"huespedEmail\": \"juan@correo.com\", \"fechaInicio\": \"2025-10-01\", \"fechaFin\": \"2025-10-05\", \"estado\": \"PENDIENTE\", \"total\": 1500000 }"
+                            ))),
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-            @ApiResponse(responseCode = "401", description = "Usuario no autenticado")
+            @ApiResponse(responseCode = "401", description = "No autenticado")
     })
-    public ResponseEntity<ReservaResponse> crearReserva(
-            @Parameter(description = "ID del alojamiento a reservar", example = "15") @RequestParam String alojamientoId,
-            @Parameter(description = "Fecha de inicio de la reserva", example = "2025-09-20") @RequestParam String fechaInicio,
-            @Parameter(description = "Fecha de fin de la reserva", example = "2025-09-25") @RequestParam String fechaFin
-    ) {
+    public ResponseEntity<ReservaResponse> crearReserva(@RequestBody ReservaRequest datos) {
         ReservaResponse r = new ReservaResponse();
-        r.id = "25";
-        r.alojamientoId = alojamientoId;
-        r.usuarioEmail = "usuario@correo.com";
-        r.fechaInicio = fechaInicio;
-        r.fechaFin = fechaFin;
-        r.estado = "Pendiente";
+        r.id = "500";
+        r.alojamientoId = datos.alojamientoId;
+        r.huespedEmail = "juan@correo.com";
+        r.fechaInicio = datos.fechaInicio;
+        r.fechaFin = datos.fechaFin;
+        r.estado = "PENDIENTE";
+        r.total = 1500000;
         return ResponseEntity.status(201).body(r);
     }
 
     // =========================
-    // ENDPOINT 2: GET /api/reservas
+    // ENDPOINT 2: GET /api/reservas/mias
     // =========================
-    @GetMapping
-    @Operation(
-            summary = "Listar reservas del usuario autenticado",
-            description = "Devuelve todas las reservas realizadas por el usuario autenticado (huésped) o recibidas (anfitrión)"
-    )
-    @ApiResponses(value = {
+    @GetMapping("/mias")
+    @Operation(summary = "Listar reservas del usuario autenticado",
+            description = "Devuelve todas las reservas hechas por el huésped autenticado")
+    @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Reservas obtenidas correctamente")
     })
-    public ResponseEntity<List<ReservaResponse>> listarReservas() {
+    public ResponseEntity<List<ReservaResponse>> listarMisReservas() {
         List<ReservaResponse> lista = new ArrayList<>();
         ReservaResponse r = new ReservaResponse();
-        r.id = "25";
+        r.id = "500";
         r.alojamientoId = "15";
-        r.usuarioEmail = "usuario@correo.com";
-        r.fechaInicio = "2025-09-20";
-        r.fechaFin = "2025-09-25";
-        r.estado = "Confirmada";
+        r.huespedEmail = "juan@correo.com";
+        r.fechaInicio = "2025-10-01";
+        r.fechaFin = "2025-10-05";
+        r.estado = "CONFIRMADA";
+        r.total = 1500000;
         lista.add(r);
         return ResponseEntity.ok(lista);
     }
@@ -104,24 +101,23 @@ public class ReservaController {
     // ENDPOINT 3: GET /api/reservas/{id}
     // =========================
     @GetMapping("/{id}")
-    @Operation(
-            summary = "Obtener detalle de una reserva",
-            description = "Permite consultar toda la información de una reserva específica por su ID"
-    )
-    @ApiResponses(value = {
+    @Operation(summary = "Obtener reserva por ID",
+            description = "Devuelve el detalle completo de una reserva específica")
+    @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Reserva encontrada"),
             @ApiResponse(responseCode = "404", description = "Reserva no encontrada")
     })
     public ResponseEntity<ReservaResponse> obtenerReserva(
-            @Parameter(description = "ID de la reserva a consultar", example = "25") @PathVariable String id
+            @Parameter(description = "ID de la reserva", example = "500") @PathVariable String id
     ) {
         ReservaResponse r = new ReservaResponse();
         r.id = id;
         r.alojamientoId = "15";
-        r.usuarioEmail = "usuario@correo.com";
-        r.fechaInicio = "2025-09-20";
-        r.fechaFin = "2025-09-25";
-        r.estado = "Pendiente";
+        r.huespedEmail = "juan@correo.com";
+        r.fechaInicio = "2025-10-01";
+        r.fechaFin = "2025-10-05";
+        r.estado = "CONFIRMADA";
+        r.total = 1500000;
         return ResponseEntity.ok(r);
     }
 
@@ -129,70 +125,38 @@ public class ReservaController {
     // ENDPOINT 4: PUT /api/reservas/{id}/cancelar
     // =========================
     @PutMapping("/{id}/cancelar")
-    @Operation(
-            summary = "Cancelar una reserva",
-            description = "Permite a un usuario cancelar una reserva activa"
-    )
-    @ApiResponses(value = {
+    @Operation(summary = "Cancelar reserva",
+            description = "Permite al huésped cancelar una reserva pendiente o confirmada")
+    @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Reserva cancelada correctamente"),
-            @ApiResponse(responseCode = "404", description = "Reserva no encontrada")
+            @ApiResponse(responseCode = "404", description = "Reserva no encontrada"),
+            @ApiResponse(responseCode = "403", description = "No autorizado a cancelar esta reserva")
     })
     public ResponseEntity<String> cancelarReserva(
-            @Parameter(description = "ID de la reserva a cancelar", example = "25") @PathVariable String id
+            @Parameter(description = "ID de la reserva", example = "500") @PathVariable String id
     ) {
-        return ResponseEntity.ok("Reserva cancelada con ID: " + id);
+        return ResponseEntity.ok("Reserva " + id + " cancelada correctamente");
     }
 
     // =========================
-    // ENDPOINT 5: GET /api/anfitrion/reservas
+    // ENDPOINT 5: GET /api/reservas/{id}/pago
     // =========================
-    @GetMapping("/anfitrion")
-    @Operation(
-            summary = "Listar reservas de los alojamientos del anfitrión",
-            description = "Devuelve todas las reservas realizadas por huéspedes en los alojamientos publicados por el anfitrión"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reservas obtenidas correctamente")
+    @GetMapping("/{id}/pago")
+    @Operation(summary = "Obtener pago asociado a la reserva",
+            description = "Devuelve el detalle del pago realizado para una reserva")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pago encontrado"),
+            @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
-    public ResponseEntity<List<ReservaResponse>> listarReservasAnfitrion() {
-        List<ReservaResponse> lista = new ArrayList<>();
-        ReservaResponse r = new ReservaResponse();
-        r.id = "40";
-        r.alojamientoId = "10";
-        r.usuarioEmail = "huésped@correo.com";
-        r.fechaInicio = "2025-09-21";
-        r.fechaFin = "2025-09-25";
-        r.estado = "Confirmada";
-        lista.add(r);
-        return ResponseEntity.ok(lista);
-    }
-
-    // =========================
-    // ENDPOINT 6: GET /api/anfitrion/reservas (con filtros)
-    // =========================
-    @GetMapping("/anfitrion/filtrar")
-    @Operation(
-            summary = "Filtrar reservas de anfitrión por estado y fechas",
-            description = "Permite al anfitrión filtrar sus reservas por estado y rango de fechas"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reservas filtradas correctamente"),
-
-    })
-    public ResponseEntity<List<ReservaResponse>> filtrarReservasAnfitrion(
-            @Parameter(description = "Estado de la reserva", example = "Pendiente") @RequestParam(required = false) String estado,
-            @Parameter(description = "Fecha desde", example = "2025-09-20") @RequestParam(required = false) String fechaDesde,
-            @Parameter(description = "Fecha hasta", example = "2025-09-30") @RequestParam(required = false) String fechaHasta
+    public ResponseEntity<PagoResponse> obtenerPagoDeReserva(
+            @Parameter(description = "ID de la reserva", example = "500") @PathVariable String id
     ) {
-        List<ReservaResponse> lista = new ArrayList<>();
-        ReservaResponse r = new ReservaResponse();
-        r.id = "41";
-        r.alojamientoId = "12";
-        r.usuarioEmail = "otro@correo.com";
-        r.fechaInicio = "2025-09-22";
-        r.fechaFin = "2025-09-25";
-        r.estado = estado != null ? estado : "Confirmada";
-        lista.add(r);
-        return ResponseEntity.ok(lista);
+        PagoResponse p = new PagoResponse();
+        p.idPago = "9001";
+        p.reservaId = id;
+        p.monto = 1500000;
+        p.estadoPago = "APROBADO";
+        p.fecha = "2025-09-20";
+        return ResponseEntity.ok(p);
     }
 }

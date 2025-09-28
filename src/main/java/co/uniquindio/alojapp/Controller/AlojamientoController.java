@@ -19,84 +19,72 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/api/alojamientos")
 @Tag(name = "Alojamientos", description = "Gestión de publicaciones de alojamientos")
-@SecurityRequirement(name = "bearerAuth") // requiere JWT
+@SecurityRequirement(name = "bearerAuth")
 public class AlojamientoController {
 
     // ===== DTOs simulados para ejemplos =====
     static class AlojamientoRequest {
-        @Schema(example = "Casa de playa en Cartagena")
-        public String titulo;
-        @Schema(example = "Hermosa casa frente al mar con piscina")
-        public String descripcion;
-        @Schema(example = "Cartagena")
-        public String ubicacion;
-        @Schema(example = "350000")
-        public double precioPorNoche;
+        @Schema(example = "Casa de playa en Cartagena") public String titulo;
+        @Schema(example = "Hermosa casa frente al mar con piscina") public String descripcion;
+        @Schema(example = "Cartagena") public String ubicacion;
+        @Schema(example = "350000") public double precioPorNoche;
+        @Schema(example = "6") public int capacidad;
+        @Schema(example = "[\"Piscina\", \"WiFi\", \"Parqueadero\"]") public List<String> servicios;
+        @Schema(example = "[\"img1.jpg\", \"img2.jpg\"]") public List<String> imagenes;
+        @Schema(example = "No se permiten mascotas") public String reglas;
     }
 
     static class AlojamientoResponse {
-        @Schema(example = "10")
-        public String id;
-        @Schema(example = "Casa de playa en Cartagena")
-        public String titulo;
-        @Schema(example = "Hermosa casa frente al mar con piscina")
-        public String descripcion;
-        @Schema(example = "Cartagena")
-        public String ubicacion;
-        @Schema(example = "350000")
-        public double precioPorNoche;
-        @Schema(example = "Disponible")
-        public String estado;
+        @Schema(example = "10") public String id;
+        @Schema(example = "Casa de playa en Cartagena") public String titulo;
+        @Schema(example = "Hermosa casa frente al mar con piscina") public String descripcion;
+        @Schema(example = "Cartagena") public String ubicacion;
+        @Schema(example = "350000") public double precioPorNoche;
+        @Schema(example = "6") public int capacidad;
+        @Schema(example = "[\"Piscina\", \"WiFi\", \"Parqueadero\"]") public List<String> servicios;
+        @Schema(example = "[\"img1.jpg\", \"img2.jpg\"]") public List<String> imagenes;
+        @Schema(example = "No se permiten mascotas") public String reglas;
+        @Schema(example = "Disponible") public String estado;
     }
 
     // =========================
     // ENDPOINT 1: POST /api/alojamientos
     // =========================
     @PostMapping
-    @Operation(
-            summary = "Crear nuevo alojamiento",
-            description = "Permite a un anfitrión publicar un nuevo alojamiento en la plataforma"
-    )
+    @Operation(summary = "Crear nuevo alojamiento", description = "Permite a un anfitrión publicar un nuevo alojamiento en la plataforma")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Alojamiento creado correctamente",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AlojamientoResponse.class),
-                            examples = @ExampleObject(
-                                    value = "{ \"id\": \"10\", \"titulo\": \"Casa de playa en Cartagena\", \"descripcion\": \"Hermosa casa frente al mar con piscina\", \"ubicacion\": \"Cartagena\", \"precioPorNoche\": 350000, \"estado\": \"Disponible\" }"
-                            )
-                    )
-            ),
+            @ApiResponse(responseCode = "201", description = "Alojamiento creado correctamente"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),
             @ApiResponse(responseCode = "401", description = "No autenticado")
     })
-    public ResponseEntity<AlojamientoResponse> crearAlojamiento(
-            @RequestBody AlojamientoRequest datos
-    ) {
+    public ResponseEntity<AlojamientoResponse> crearAlojamiento(@RequestBody AlojamientoRequest datos) {
         AlojamientoResponse r = new AlojamientoResponse();
         r.id = "10";
         r.titulo = datos.titulo;
         r.descripcion = datos.descripcion;
         r.ubicacion = datos.ubicacion;
         r.precioPorNoche = datos.precioPorNoche;
+        r.capacidad = datos.capacidad;
+        r.servicios = datos.servicios;
+        r.imagenes = datos.imagenes;
+        r.reglas = datos.reglas;
         r.estado = "Disponible";
         return ResponseEntity.status(201).body(r);
     }
 
     // =========================
-    // ENDPOINT 2: GET /api/alojamientos
+    // ENDPOINT 2: GET /api/alojamientos (con filtros)
     // =========================
     @GetMapping
-    @Operation(
-            summary = "Listar alojamientos publicados",
-            description = "Obtiene todos los alojamientos publicados en la plataforma"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
-    })
-    public ResponseEntity<List<AlojamientoResponse>> listarAlojamientos() {
+    @Operation(summary = "Listar alojamientos con filtros", description = "Obtiene los alojamientos disponibles aplicando filtros de búsqueda (ciudad, fechas, precio, servicios, capacidad)")
+    @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
+    public ResponseEntity<List<AlojamientoResponse>> listarAlojamientos(
+            @Parameter(description = "Ciudad del alojamiento", example = "Cartagena") @RequestParam(required = false) String ciudad,
+            @Parameter(description = "Precio mínimo", example = "100000") @RequestParam(required = false) Double precioMin,
+            @Parameter(description = "Precio máximo", example = "500000") @RequestParam(required = false) Double precioMax,
+            @Parameter(description = "Capacidad mínima", example = "4") @RequestParam(required = false) Integer capacidad,
+            @Parameter(description = "Lista de servicios requeridos", example = "WiFi,Piscina") @RequestParam(required = false) List<String> servicios
+    ) {
         List<AlojamientoResponse> lista = new ArrayList<>();
         AlojamientoResponse r = new AlojamientoResponse();
         r.id = "10";
@@ -104,6 +92,10 @@ public class AlojamientoController {
         r.descripcion = "Hermosa casa frente al mar con piscina";
         r.ubicacion = "Cartagena";
         r.precioPorNoche = 350000;
+        r.capacidad = 6;
+        r.servicios = List.of("Piscina", "WiFi", "Parqueadero");
+        r.imagenes = List.of("img1.jpg", "img2.jpg");
+        r.reglas = "No se permiten mascotas";
         r.estado = "Disponible";
         lista.add(r);
         return ResponseEntity.ok(lista);
@@ -113,17 +105,13 @@ public class AlojamientoController {
     // ENDPOINT 3: GET /api/alojamientos/{id}
     // =========================
     @GetMapping("/{id}")
-    @Operation(
-            summary = "Obtener alojamiento por ID",
-            description = "Obtiene el detalle completo de un alojamiento específico"
-    )
+    @Operation(summary = "Obtener alojamiento por ID", description = "Obtiene el detalle completo de un alojamiento específico")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Alojamiento encontrado"),
             @ApiResponse(responseCode = "404", description = "Alojamiento no encontrado")
     })
     public ResponseEntity<AlojamientoResponse> obtenerAlojamiento(
-            @Parameter(description = "ID del alojamiento a buscar", example = "10")
-            @PathVariable String id
+            @Parameter(description = "ID del alojamiento a buscar", example = "10") @PathVariable String id
     ) {
         AlojamientoResponse r = new AlojamientoResponse();
         r.id = id;
@@ -131,6 +119,10 @@ public class AlojamientoController {
         r.descripcion = "Hermosa casa frente al mar con piscina";
         r.ubicacion = "Cartagena";
         r.precioPorNoche = 350000;
+        r.capacidad = 6;
+        r.servicios = List.of("Piscina", "WiFi", "Parqueadero");
+        r.imagenes = List.of("img1.jpg", "img2.jpg");
+        r.reglas = "No se permiten mascotas";
         r.estado = "Disponible";
         return ResponseEntity.ok(r);
     }
@@ -139,10 +131,7 @@ public class AlojamientoController {
     // ENDPOINT 4: PUT /api/alojamientos/{id}
     // =========================
     @PutMapping("/{id}")
-    @Operation(
-            summary = "Actualizar alojamiento",
-            description = "Permite modificar los datos de un alojamiento existente"
-    )
+    @Operation(summary = "Actualizar alojamiento", description = "Permite modificar los datos de un alojamiento existente")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Alojamiento actualizado correctamente"),
             @ApiResponse(responseCode = "404", description = "Alojamiento no encontrado")
@@ -158,10 +147,7 @@ public class AlojamientoController {
     // ENDPOINT 5: DELETE /api/alojamientos/{id}
     // =========================
     @DeleteMapping("/{id}")
-    @Operation(
-            summary = "Eliminar alojamiento",
-            description = "Permite eliminar un alojamiento publicado"
-    )
+    @Operation(summary = "Eliminar alojamiento", description = "Permite eliminar un alojamiento publicado")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Alojamiento eliminado correctamente"),
             @ApiResponse(responseCode = "404", description = "Alojamiento no encontrado")

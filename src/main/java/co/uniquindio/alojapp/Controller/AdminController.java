@@ -22,7 +22,7 @@ import java.util.ArrayList;
 @SecurityRequirement(name = "bearerAuth")
 public class AdminController {
 
-    // DTOs simulados solo para documentación de ejemplos
+    // ===== DTOs simulados para documentación =====
     static class UsuarioResponse {
         @Schema(example = "55") public String id;
         @Schema(example = "juan@correo.com") public String email;
@@ -37,17 +37,29 @@ public class AdminController {
         @Schema(example = "ACTIVO") public String estado;
     }
 
+    static class ReservaResponse {
+        @Schema(example = "40") public String id;
+        @Schema(example = "Casa en la playa") public String alojamiento;
+        @Schema(example = "huésped@correo.com") public String huespedEmail;
+        @Schema(example = "2025-10-01") public String fechaInicio;
+        @Schema(example = "2025-10-05") public String fechaFin;
+        @Schema(example = "CONFIRMADA") public String estado;
+    }
+
+    static class PagoResponse {
+        @Schema(example = "77") public String id;
+        @Schema(example = "40") public String reservaId;
+        @Schema(example = "350000") public Double monto;
+        @Schema(example = "TARJETA") public String metodo;
+        @Schema(example = "COMPLETADO") public String estado;
+    }
+
     // =========================
-    // ENDPOINT 1: GET /api/admin/usuarios
+    // USUARIOS
     // =========================
     @GetMapping("/usuarios")
-    @Operation(
-            summary = "Listar todos los usuarios",
-            description = "Permite al administrador obtener una lista de todos los usuarios registrados"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Usuarios obtenidos correctamente")
-    })
+    @Operation(summary = "Listar todos los usuarios", description = "Permite al administrador obtener una lista de todos los usuarios registrados")
+    @ApiResponse(responseCode = "200", description = "Usuarios obtenidos correctamente")
     public ResponseEntity<List<UsuarioResponse>> listarUsuarios() {
         List<UsuarioResponse> lista = new ArrayList<>();
         UsuarioResponse u = new UsuarioResponse();
@@ -59,14 +71,8 @@ public class AdminController {
         return ResponseEntity.ok(lista);
     }
 
-    // =========================
-    // ENDPOINT 2: PUT /api/admin/usuarios/{id}/estado
-    // =========================
     @PutMapping("/usuarios/{id}/estado")
-    @Operation(
-            summary = "Cambiar estado de un usuario",
-            description = "Permite al administrador activar o bloquear un usuario de la plataforma"
-    )
+    @Operation(summary = "Cambiar estado de un usuario", description = "Permite al administrador activar o bloquear un usuario de la plataforma")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Estado actualizado correctamente"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
@@ -79,16 +85,11 @@ public class AdminController {
     }
 
     // =========================
-    // ENDPOINT 3: GET /api/admin/alojamientos
+    // ALOJAMIENTOS
     // =========================
     @GetMapping("/alojamientos")
-    @Operation(
-            summary = "Listar todos los alojamientos",
-            description = "Permite al administrador obtener todos los alojamientos registrados"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Alojamientos obtenidos correctamente")
-    })
+    @Operation(summary = "Listar todos los alojamientos", description = "Permite al administrador obtener todos los alojamientos registrados")
+    @ApiResponse(responseCode = "200", description = "Alojamientos obtenidos correctamente")
     public ResponseEntity<List<AlojamientoResponse>> listarAlojamientos() {
         List<AlojamientoResponse> lista = new ArrayList<>();
         AlojamientoResponse a = new AlojamientoResponse();
@@ -100,14 +101,8 @@ public class AdminController {
         return ResponseEntity.ok(lista);
     }
 
-    // =========================
-    // ENDPOINT 4: PUT /api/admin/alojamientos/{id}/estado
-    // =========================
     @PutMapping("/alojamientos/{id}/estado")
-    @Operation(
-            summary = "Cambiar estado de un alojamiento",
-            description = "Permite al administrador aprobar o bloquear un alojamiento publicado"
-    )
+    @Operation(summary = "Cambiar estado de un alojamiento", description = "Permite al administrador aprobar o bloquear un alojamiento publicado")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Estado actualizado correctamente"),
             @ApiResponse(responseCode = "404", description = "Alojamiento no encontrado")
@@ -120,13 +115,47 @@ public class AdminController {
     }
 
     // =========================
-    // ENDPOINT 5: DELETE /api/admin/comentarios/{id}
+    // RESERVAS
+    // =========================
+    @GetMapping("/reservas")
+    @Operation(summary = "Listar todas las reservas", description = "Permite al administrador obtener todas las reservas del sistema")
+    @ApiResponse(responseCode = "200", description = "Reservas obtenidas correctamente")
+    public ResponseEntity<List<ReservaResponse>> listarReservas() {
+        List<ReservaResponse> lista = new ArrayList<>();
+        ReservaResponse r = new ReservaResponse();
+        r.id = "40";
+        r.alojamiento = "Casa en la playa";
+        r.huespedEmail = "huésped@correo.com";
+        r.fechaInicio = "2025-10-01";
+        r.fechaFin = "2025-10-05";
+        r.estado = "CONFIRMADA";
+        lista.add(r);
+        return ResponseEntity.ok(lista);
+    }
+
+    // =========================
+    // PAGOS
+    // =========================
+    @GetMapping("/pagos")
+    @Operation(summary = "Listar todos los pagos", description = "Permite al administrador obtener todos los pagos realizados en la plataforma")
+    @ApiResponse(responseCode = "200", description = "Pagos obtenidos correctamente")
+    public ResponseEntity<List<PagoResponse>> listarPagos() {
+        List<PagoResponse> lista = new ArrayList<>();
+        PagoResponse p = new PagoResponse();
+        p.id = "77";
+        p.reservaId = "40";
+        p.monto = 350000.0;
+        p.metodo = "TARJETA";
+        p.estado = "COMPLETADO";
+        lista.add(p);
+        return ResponseEntity.ok(lista);
+    }
+
+    // =========================
+    // COMENTARIOS
     // =========================
     @DeleteMapping("/comentarios/{id}")
-    @Operation(
-            summary = "Eliminar comentario ofensivo",
-            description = "Permite al administrador eliminar un comentario reportado como inapropiado"
-    )
+    @Operation(summary = "Eliminar comentario ofensivo", description = "Permite al administrador eliminar un comentario reportado como inapropiado")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Comentario eliminado correctamente"),
             @ApiResponse(responseCode = "404", description = "Comentario no encontrado")
