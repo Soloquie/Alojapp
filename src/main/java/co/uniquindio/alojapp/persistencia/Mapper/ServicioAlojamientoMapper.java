@@ -6,22 +6,17 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ServicioAlojamientoMapper {
 
-    // === Entity → DTO ===
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "descripcion", source = "descripcion")
     ServicioAlojamientoDTO toDTO(ServicioAlojamiento entity);
 
-    // === DTO → Entity ===
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "alojamientos", ignore = true)
+    @Mapping(target = "iconoUrl", ignore = true)
     ServicioAlojamiento toEntity(ServicioAlojamientoDTO dto);
 
-    // === List<Entity> → List<DTO> ===
     List<ServicioAlojamientoDTO> toDTOList(List<ServicioAlojamiento> servicios);
-
-    // === Actualización (DTO → Entity existente) ===
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "alojamientos", ignore = true)
-    void updateFromDTO(@MappingTarget ServicioAlojamiento entity, ServicioAlojamientoDTO dto);
 }

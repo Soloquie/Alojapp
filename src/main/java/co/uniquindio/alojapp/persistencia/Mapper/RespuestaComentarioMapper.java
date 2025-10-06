@@ -6,26 +6,21 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RespuestaComentarioMapper {
 
-    // === Entity → DTO ===
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "contenido", source = "respuestaTexto")
+    @Mapping(target = "fechaRespuesta", source = "fechaRespuesta")
     @Mapping(target = "comentarioId", source = "comentario.id")
-    @Mapping(target = "autorNombre", source = "autor.nombre")
+    @Mapping(target = "autorNombre", source = "anfitrion.usuario.nombre")
     RespuestaComentarioDTO toDTO(RespuestaComentario entity);
 
-    // === DTO → Entity ===
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "respuestaTexto", source = "contenido")
     @Mapping(target = "comentario", ignore = true)
-    @Mapping(target = "autor", ignore = true)
+    @Mapping(target = "anfitrion", ignore = true)
+    @Mapping(target = "fechaRespuesta", ignore = true)
     RespuestaComentario toEntity(RespuestaComentarioDTO dto);
 
-    // === List<Entity> → List<DTO> ===
     List<RespuestaComentarioDTO> toDTOList(List<RespuestaComentario> respuestas);
-
-    // === Actualización (DTO → Entity existente) ===
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "comentario", ignore = true)
-    @Mapping(target = "autor", ignore = true)
-    void updateFromDTO(@MappingTarget RespuestaComentario entity, RespuestaComentarioDTO dto);
 }

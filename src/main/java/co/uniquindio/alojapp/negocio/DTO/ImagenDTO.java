@@ -1,9 +1,13 @@
 package co.uniquindio.alojapp.negocio.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "DTO que representa una imagen asociada a un alojamiento")
 public class ImagenDTO {
 

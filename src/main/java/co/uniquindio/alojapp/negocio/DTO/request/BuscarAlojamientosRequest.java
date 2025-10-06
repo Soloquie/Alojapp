@@ -45,19 +45,23 @@ public class BuscarAlojamientosRequest {
     @Schema(description = "Lista de IDs de servicios requeridos", example = "[1, 3, 7]")
     private List<Long> serviciosIds;
 
+    @Builder.Default
     @Min(value = 0, message = "La página no puede ser negativa")
     @Schema(description = "Número de página (para paginación)", example = "0")
     private Integer pagina = 0;
 
+    @Builder.Default
     @Min(value = 1, message = "El tamaño debe ser al menos 1")
     @Max(value = 50, message = "El tamaño máximo es 50")
     @Schema(description = "Cantidad de resultados por página", example = "10")
     private Integer tamanoPagina = 10;
 
-    @Schema(description = "Campo por el cual ordenar", example = "precio_noche")
-    private String ordenarPor;
-
+    @Builder.Default
     @Schema(description = "Dirección del ordenamiento", example = "ASC")
     @Pattern(regexp = "ASC|DESC", message = "La dirección debe ser ASC o DESC")
     private String direccionOrden = "ASC";
+
+    @Schema(description = "Campo por el cual ordenar", example = "precio_noche")
+    private String ordenarPor;
+
 }

@@ -1,7 +1,6 @@
 package co.uniquindio.alojapp.persistencia.Entity;
 
 import co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoUsuario;
-import co.uniquindio.alojapp.persistencia.Entity.Enum.Rol;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -9,6 +8,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -74,22 +74,28 @@ public class Usuario {
     // ========== Relaciones ==========
 
     @OneToMany(mappedBy = "huesped", cascade = CascadeType.ALL)
-    private List<Reserva> reservasRealizadas;
-
-    @OneToMany(mappedBy = "anfitrion", cascade = CascadeType.ALL)
-    private List<Alojamiento> alojamientos;
+    @Builder.Default
+    private List<Reserva> reservasRealizadas = new ArrayList<>();
 
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL)
-    private List<Comentario> comentarios;
+    @Builder.Default
+    private List<Comentario> comentarios = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private List<Notificacion> notificaciones;
+    @Builder.Default
+    private List<Notificacion> notificaciones = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private List<Favorito> favoritos;
+    @Builder.Default
+    private List<Favorito> favoritos = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private List<CodigoRecuperacion> codigosRecuperacion;
+    @Builder.Default
+    private List<CodigoRecuperacion> codigosRecuperacion = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Pago> pagos = new ArrayList<>();
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Anfitrion perfilAnfitrion;

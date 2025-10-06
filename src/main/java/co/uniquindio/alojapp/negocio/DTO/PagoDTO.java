@@ -34,4 +34,7 @@ public class PagoDTO {
 
     @Schema(description = "Código o referencia de la transacción", example = "TXN-98456231")
     private String referenciaTransaccion;
+
+    @Schema(description = "Metodo por el cual se paga", example = "Tarjeta, Efectivo")
+    private String metodoPago;
 }

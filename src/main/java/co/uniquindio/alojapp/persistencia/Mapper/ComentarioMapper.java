@@ -6,7 +6,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
+@Mapper(componentModel = "spring", uses = {RespuestaComentarioMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ComentarioMapper {
 
     @Mapping(target = "id", source = "id")
@@ -20,7 +20,6 @@ public interface ComentarioMapper {
     @Mapping(target = "respuestas", source = "respuestas")
     ComentarioDTO toDTO(Comentario comentario);
 
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "reserva", ignore = true)
     @Mapping(target = "autor", ignore = true)
     @Mapping(target = "alojamiento", ignore = true)
@@ -29,12 +28,4 @@ public interface ComentarioMapper {
     Comentario toEntity(ComentarioDTO dto);
 
     List<ComentarioDTO> toDTOList(List<Comentario> comentarios);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "reserva", ignore = true)
-    @Mapping(target = "autor", ignore = true)
-    @Mapping(target = "alojamiento", ignore = true)
-    @Mapping(target = "respuestas", ignore = true)
-    @Mapping(target = "fechaComentario", ignore = true)
-    void updateFromDTO(@MappingTarget Comentario comentario, ComentarioDTO dto);
 }

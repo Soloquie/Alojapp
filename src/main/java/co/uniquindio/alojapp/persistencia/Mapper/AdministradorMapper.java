@@ -6,20 +6,21 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface AdministradorMapper {
 
-    // === Entity → DTO ===
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "nombre", source = "usuario.nombre")
+    @Mapping(target = "email", source = "usuario.email")
+    @Mapping(target = "telefono", source = "usuario.telefono")
+    @Mapping(target = "estado", source = "usuario.estado")
     AdministradorDTO toDTO(Administrador admin);
 
-    // === DTO → Entity ===
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "usuario", ignore = true)
+    @Mapping(target = "nivelAcceso", ignore = true)
+    @Mapping(target = "permisos", ignore = true)
+    @Mapping(target = "fechaAsignacion", ignore = true)
     Administrador toEntity(AdministradorDTO dto);
 
-    // === List<Entity> → List<DTO> ===
     List<AdministradorDTO> toDTOList(List<Administrador> admins);
-
-    // === Actualización (DTO → Entity existente) ===
-    @Mapping(target = "id", ignore = true)
-    void updateFromDTO(@MappingTarget Administrador admin, AdministradorDTO dto);
 }
