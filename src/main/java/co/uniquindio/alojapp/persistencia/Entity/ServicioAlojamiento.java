@@ -2,8 +2,10 @@ package co.uniquindio.alojapp.persistencia.Entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,25 +15,30 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "Entidad que representa un servicio disponible en los alojamientos (ej. Wi-Fi, Piscina, Parqueadero).")
 public class ServicioAlojamiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "servicio_id")
     @Schema(description = "Identificador único del servicio", example = "1")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
-    @Schema(description = "Nombre del servicio ofrecido", example = "Wi-Fi")
+    @Column(nullable = false, length = 100)
+    @NotBlank(message = "El nombre del servicio es obligatorio")
+    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
+    @Schema(description = "Nombre del servicio", example = "Wi-Fi")
     private String nombre;
 
     @Column(length = 255)
-    @Schema(description = "Descripción opcional del servicio", example = "Conexión a internet de alta velocidad disponible en todo el alojamiento.")
+    @Size(max = 255, message = "La descripción no puede exceder 255 caracteres")
+    @Schema(description = "Descripción del servicio")
     private String descripcion;
 
-    // ========= Relaciones =========
+    @Column(name = "icono_url", length = 500)
+    @Schema(description = "URL del icono del servicio")
+    private String iconoUrl;
 
     @ManyToMany(mappedBy = "servicios")
-    @Schema(description = "Lista de alojamientos que ofrecen este servicio.")
-    private List<Alojamiento> alojamientos;
+    @Builder.Default
+    private List<Alojamiento> alojamientos = new ArrayList<>();
 }

@@ -2,48 +2,39 @@ package co.uniquindio.alojapp.persistencia.Mapper;
 
 import co.uniquindio.alojapp.negocio.DTO.ComentarioDTO;
 import co.uniquindio.alojapp.persistencia.Entity.Comentario;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
+
 import java.util.List;
 
-/**
- * Mapper responsable de convertir entre la entidad Comentario y su DTO correspondiente.
- * Gestiona los mapeos para la documentación y capa de servicio.
- */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ComentarioMapper {
 
-    // ===============================
-    // ENTITY → DTO
-    // ===============================
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "contenido", source = "contenido")
-    @Mapping(target = "calificacion", source = "calificacion")
-    @Mapping(target = "fechaPublicacion", source = "fechaPublicacion")
-    @Mapping(target = "autorId", source = "autor.id")
+    @Mapping(target = "reservaId", source = "reserva.id")
+    @Mapping(target = "usuarioId", source = "autor.id")
+    @Mapping(target = "usuarioNombre", source = "autor.nombre")
     @Mapping(target = "alojamientoId", source = "alojamiento.id")
-    ComentarioDTO comentarioToDTO(Comentario comentario);
+    @Mapping(target = "calificacion", source = "calificacion")
+    @Mapping(target = "comentarioTexto", source = "comentarioTexto")
+    @Mapping(target = "fechaComentario", source = "fechaComentario")
+    @Mapping(target = "respuestas", source = "respuestas")
+    ComentarioDTO toDTO(Comentario comentario);
 
-    // ===============================
-    // DTO → ENTITY (para crear)
-    // ===============================
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", ignore = true)
     @Mapping(target = "autor", ignore = true)
     @Mapping(target = "alojamiento", ignore = true)
-    Comentario dtoToComentario(ComentarioDTO dto);
+    @Mapping(target = "respuestas", ignore = true)
+    @Mapping(target = "fechaComentario", ignore = true)
+    Comentario toEntity(ComentarioDTO dto);
 
-    // ===============================
-    // LISTA ENTITY → LISTA DTO
-    // ===============================
-    List<ComentarioDTO> comentariosToDTO(List<Comentario> comentarios);
+    List<ComentarioDTO> toDTOList(List<Comentario> comentarios);
 
-    // ===============================
-    // ACTUALIZAR ENTITY EXISTENTE DESDE DTO
-    // ===============================
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", ignore = true)
     @Mapping(target = "autor", ignore = true)
     @Mapping(target = "alojamiento", ignore = true)
-    void updateComentarioFromDTO(@MappingTarget Comentario comentario, ComentarioDTO dto);
+    @Mapping(target = "respuestas", ignore = true)
+    @Mapping(target = "fechaComentario", ignore = true)
+    void updateFromDTO(@MappingTarget Comentario comentario, ComentarioDTO dto);
 }

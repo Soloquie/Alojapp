@@ -2,14 +2,10 @@ package co.uniquindio.alojapp.persistencia.Entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
-/**
- * Entidad que representa a un administrador dentro de la plataforma.
- * Cada administrador está vinculado a un usuario general mediante una relación uno a uno.
- */
 
 @Entity
 @Table(name = "administradores")
@@ -22,27 +18,34 @@ public class Administrador {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "administrador_id")
     @Schema(description = "Identificador único del administrador", example = "1")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    @NotNull(message = "El usuario es obligatorio")
     @Schema(description = "Usuario asociado al administrador")
     private Usuario usuario;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "nivel_acceso", nullable = false, length = 50)
+    @NotBlank(message = "El nivel de acceso es obligatorio")
+    @Pattern(regexp = "SUPER_ADMIN|ADMIN|MODERADOR", message = "Nivel de acceso inválido")
     @Schema(description = "Nivel de acceso del administrador", example = "SUPER_ADMIN")
     private String nivelAcceso;
 
-    @Column(length = 255)
-    @Schema(description = "Permisos específicos asignados al administrador", example = "GESTION_USUARIOS, REVISION_COMENTARIOS")
+    @Column(columnDefinition = "JSON")
+    @Schema(description = "Permisos específicos en formato JSON")
     private String permisos;
 
     @Column(name = "fecha_asignacion", nullable = false)
-    @Schema(description = "Fecha en la que el usuario fue asignado como administrador", example = "2025-01-15T09:30:00")
+    @Schema(description = "Fecha de asignación como administrador")
     private LocalDateTime fechaAsignacion;
 
-    @Column(name = "activo", nullable = false)
-    @Schema(description = "Indica si el administrador está activo o suspendido", example = "true")
-    private boolean activo;
+    @PrePersist
+    protected void onCreate() {
+        if (fechaAsignacion == null) {
+            fechaAsignacion = LocalDateTime.now();
+        }
+    }
 }

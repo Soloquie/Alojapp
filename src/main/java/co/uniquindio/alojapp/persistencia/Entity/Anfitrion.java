@@ -2,15 +2,11 @@ package co.uniquindio.alojapp.persistencia.Entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-
-/**
- * Entidad que representa a un anfitrión dentro de la plataforma.
- * El anfitrión está asociado a un usuario general y puede tener múltiples alojamientos.
- */
 
 @Entity
 @Table(name = "anfitriones")
@@ -23,35 +19,46 @@ public class Anfitrion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "anfitrion_id")
     @Schema(description = "Identificador único del anfitrión", example = "1")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    @NotNull(message = "El usuario es obligatorio")
     @Schema(description = "Usuario asociado al anfitrión")
     private Usuario usuario;
 
-    @Column(nullable = false, length = 100)
-    @Schema(description = "Número de identificación o documento del anfitrión", example = "1098765432")
-    private String documentoIdentidad;
+    @Column(name = "descripcion_personal", columnDefinition = "TEXT")
+    @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres")
+    @Schema(description = "Descripción personal del anfitrión")
+    private String descripcionPersonal;
 
-    @Column(nullable = false, length = 20)
-    @Schema(description = "Tipo de documento de identificación", example = "CÉDULA")
-    private String tipoDocumento;
+    @Column(name = "documentos_legales_url", length = 500)
+    @Schema(description = "URL de documentos legales")
+    private String documentosLegalesUrl;
+
+    @Column(name = "fecha_registro_anfitrion", nullable = false)
+    @Schema(description = "Fecha de registro como anfitrión")
+    private LocalDateTime fechaRegistroAnfitrion;
 
     @Column(nullable = false)
-    @Schema(description = "Fecha de registro del anfitrión en la plataforma", example = "2024-10-01")
-    private LocalDate fechaRegistro;
-
-    @Column(length = 255)
-    @Schema(description = "Descripción breve del anfitrión o presentación pública", example = "Apasionado por ofrecer experiencias únicas en el Caribe colombiano.")
-    private String descripcion;
+    @Schema(description = "Indica si el anfitrión está verificado", example = "false")
+    private Boolean verificado = false;
 
     @OneToMany(mappedBy = "anfitrion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Schema(description = "Lista de alojamientos publicados por el anfitrión")
     private List<Alojamiento> alojamientos;
 
-    @Column(nullable = false)
-    @Schema(description = "Indica si el anfitrión está activo o suspendido", example = "true")
-    private boolean activo;
+    @OneToMany(mappedBy = "anfitrion", cascade = CascadeType.ALL)
+    private List<RespuestaComentario> respuestas;
+
+    @PrePersist
+    protected void onCreate() {
+        if (fechaRegistroAnfitrion == null) {
+            fechaRegistroAnfitrion = LocalDateTime.now();
+        }
+        if (verificado == null) {
+            verificado = false;
+        }
+    }
 }

@@ -1,34 +1,45 @@
 package co.uniquindio.alojapp.negocio.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "DTO de comentario sincronizado con BD")
 public class ComentarioDTO {
 
-    @Schema(description = "Identificador único del comentario", example = "100")
-    private String id;
+    @Schema(description = "ID del comentario", example = "100")
+    private Long id;
 
-    @Schema(description = "Identificador del alojamiento al que pertenece el comentario", example = "15")
-    private String alojamientoId;
+    @Schema(description = "ID de la reserva", example = "25")
+    private Long reservaId;
 
-    @Schema(description = "Correo electrónico del autor del comentario", example = "usuario@correo.com")
-    private String autorEmail;
+    @Schema(description = "ID del usuario", example = "15")
+    private Long usuarioId;
 
-    @Schema(description = "Contenido del comentario escrito por el usuario", example = "Excelente alojamiento, muy limpio y cómodo.")
-    private String contenido;
+    @Schema(description = "Nombre del usuario", example = "Juan Pérez")
+    private String usuarioNombre;
 
-    @Schema(description = "Calificación otorgada por el huésped al alojamiento (1-5)", example = "5")
-    private int calificacion;
+    @Schema(description = "ID del alojamiento", example = "10")
+    private Long alojamientoId;
 
-    @Schema(description = "Fecha y hora en que se realizó el comentario", example = "2025-09-10T14:30:00")
-    private LocalDateTime fechaPublicacion;
+    @Schema(description = "Calificación (1-5)", example = "5")
+    private Integer calificacion;
 
-    @Schema(description = "Indica si el comentario ha sido reportado por otros usuarios", example = "false")
-    private boolean reportado;
+    @Schema(description = "Texto del comentario")
+    private String comentarioTexto;
+
+    @Schema(description = "Fecha del comentario")
+    private LocalDateTime fechaComentario;
+
+    @Schema(description = "Lista de respuestas del anfitrión")
+    private List<RespuestaComentarioDTO> respuestas;
 }

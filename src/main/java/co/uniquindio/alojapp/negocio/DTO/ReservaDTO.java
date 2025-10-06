@@ -1,53 +1,64 @@
 package co.uniquindio.alojapp.negocio.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Representa los datos de una reserva realizada por un huésped en un alojamiento.")
+@Schema(description = "DTO de reserva sincronizado con BD")
 public class ReservaDTO {
 
-    @Schema(description = "Identificador único de la reserva", example = "45")
+    @Schema(description = "ID de la reserva", example = "45")
     private Long id;
 
-    @Schema(description = "Identificador del alojamiento reservado", example = "10")
+    @Schema(description = "ID del alojamiento", example = "10")
     private Long alojamientoId;
 
-    @Schema(description = "Nombre o título del alojamiento reservado", example = "Casa de playa en Cartagena")
+    @Schema(description = "Nombre del alojamiento", example = "Casa de playa en Cartagena")
     private String alojamientoNombre;
 
-    @Schema(description = "Identificador del huésped que realizó la reserva", example = "25")
+    @Schema(description = "ID del huésped", example = "25")
     private Long huespedId;
 
-    @Schema(description = "Nombre completo del huésped", example = "Juan Pérez")
+    @Schema(description = "Nombre del huésped", example = "Juan Pérez")
     private String huespedNombre;
 
-    @Schema(description = "Fecha y hora de inicio de la reserva", example = "2025-09-20T15:00:00")
-    private LocalDateTime fechaInicio;
+    @Schema(description = "Fecha de check-in", example = "2025-09-20")
+    private LocalDate fechaCheckin;
 
-    @Schema(description = "Fecha y hora de fin de la reserva", example = "2025-09-25T11:00:00")
-    private LocalDateTime fechaFin;
+    @Schema(description = "Fecha de check-out", example = "2025-09-25")
+    private LocalDate fechaCheckout;
 
-    @Schema(description = "Número total de noches reservadas", example = "5")
-    private int cantidadNoches;
+    @Schema(description = "Número de huéspedes", example = "4")
+    private Integer numeroHuespedes;
 
-    @Schema(description = "Costo total de la reserva (en pesos colombianos)", example = "1750000")
-    private double total;
+    @Schema(description = "Precio total", example = "1750000.00")
+    private BigDecimal precioTotal;
 
-    @Schema(description = "Estado actual de la reserva (por ejemplo: PENDIENTE, CONFIRMADA, CANCELADA, FINALIZADA)", example = "CONFIRMADA")
+    @Schema(description = "Estado de la reserva", example = "CONFIRMADA")
     private String estado;
 
-    @Schema(description = "Fecha y hora en que se creó la reserva", example = "2025-09-01T10:30:00")
+    @Schema(description = "Fecha de creación")
     private LocalDateTime fechaCreacion;
 
-    @Schema(description = "Método de pago utilizado (por ejemplo: TARJETA, TRANSFERENCIA)", example = "TARJETA")
-    private String metodoPago;
+    @Schema(description = "Fecha de cancelación")
+    private LocalDateTime fechaCancelacion;
 
-    @Schema(description = "ID del pago asociado a la reserva, si aplica", example = "90")
-    private Long pagoId;
+    @Schema(description = "Motivo de cancelación")
+    private String motivoCancelacion;
+
+    @Schema(description = "Cantidad de noches", example = "5")
+    private Long cantidadNoches;
+
+    @Schema(description = "Puede ser cancelada", example = "true")
+    private Boolean puedeCancelarse;
 }
