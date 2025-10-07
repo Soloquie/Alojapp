@@ -24,7 +24,7 @@ public class Alojamiento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "alojamiento_id")
     @Schema(description = "Identificador único del alojamiento", example = "10")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "anfitrion_id", nullable = false)

@@ -12,17 +12,17 @@ import java.util.Optional;
  * Repositorio para operaciones con administradores
  */
 @Repository
-public interface AdministradorRepository extends JpaRepository<Administrador, Long> {
+public interface AdministradorRepository extends JpaRepository<Administrador, Integer> {
 
     /**
      * Buscar administrador por ID de usuario
      */
-    Optional<Administrador> findByUsuarioId(Long usuarioId);
+    Optional<Administrador> findByUsuarioId(Integer usuarioId);
 
     /**
      * Verificar si un usuario ya es administrador
      */
-    boolean existsByUsuarioId(Long usuarioId);
+    boolean existsByUsuarioId(Integer usuarioId);
 
     /**
      * Buscar administradores por nivel de acceso

@@ -41,7 +41,7 @@ public class ServicioAlojamientoDAO {
     /**
      * Buscar servicio por ID
      */
-    public Optional<ServicioAlojamientoDTO> findById(Long id) {
+    public Optional<ServicioAlojamientoDTO> findById(Integer id) {
         return servicioRepository.findById(id)
                 .map(servicioMapper::toDTO);
     }
@@ -71,14 +71,14 @@ public class ServicioAlojamientoDAO {
     /**
      * Contar alojamientos que usan un servicio
      */
-    public Long countAlojamientosByServicio(Long servicioId) {
+    public Long countAlojamientosByServicio(Integer servicioId) {
         return servicioRepository.countAlojamientosByServicioId(servicioId);
     }
 
     /**
      * Actualizar servicio
      */
-    public Optional<ServicioAlojamientoDTO> actualizar(Long id, String nombre, String descripcion, String iconoUrl) {
+    public Optional<ServicioAlojamientoDTO> actualizar(Integer id, String nombre, String descripcion, String iconoUrl) {
         return servicioRepository.findById(id)
                 .map(servicio -> {
                     if (nombre != null) servicio.setNombre(nombre);
@@ -92,7 +92,7 @@ public class ServicioAlojamientoDAO {
     /**
      * Eliminar servicio
      */
-    public boolean delete(Long id) {
+    public boolean delete(Integer id) {
         if (servicioRepository.existsById(id)) {
             servicioRepository.deleteById(id);
             return true;

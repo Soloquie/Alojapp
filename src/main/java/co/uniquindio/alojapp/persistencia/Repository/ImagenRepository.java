@@ -13,18 +13,18 @@ import java.util.List;
  * Implementa RN3: Al menos 1 imagen, máximo 10 imágenes
  */
 @Repository
-public interface ImagenRepository extends JpaRepository<Imagen, Long> {
+public interface ImagenRepository extends JpaRepository<Imagen, Integer> {
 
     /**
      * Buscar imágenes por alojamiento ordenadas
      */
-    List<Imagen> findByAlojamientoIdOrderByOrden(Long alojamientoId);
+    List<Imagen> findByAlojamientoIdOrderByOrden(Integer alojamientoId);
 
     /**
      * Contar imágenes de un alojamiento
      * RN3: Validar límite de 10 imágenes
      */
-    Long countByAlojamientoId(Long alojamientoId);
+    Long countByAlojamientoId(Integer alojamientoId);
 
     /**
      * Verificar si un alojamiento tiene imágenes
@@ -32,12 +32,12 @@ public interface ImagenRepository extends JpaRepository<Imagen, Long> {
      */
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM Imagen i " +
             "WHERE i.alojamiento.id = :alojamientoId")
-    boolean tieneImagenes(@Param("alojamientoId") Long alojamientoId);
+    boolean tieneImagenes(@Param("alojamientoId") Integer alojamientoId);
 
     /**
      * Eliminar todas las imágenes de un alojamiento
      */
-    void deleteByAlojamientoId(Long alojamientoId);
+    void deleteByAlojamientoId(Integer alojamientoId);
 
     /**
      * Buscar imagen por URL

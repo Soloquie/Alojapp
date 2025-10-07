@@ -13,7 +13,7 @@ import java.util.Optional;
  * Repositorio para operaciones con servicios de alojamiento
  */
 @Repository
-public interface ServicioAlojamientoRepository extends JpaRepository<ServicioAlojamiento, Long> {
+public interface ServicioAlojamientoRepository extends JpaRepository<ServicioAlojamiento, Integer> {
 
     /**
      * Buscar servicio por nombre
@@ -43,5 +43,5 @@ public interface ServicioAlojamientoRepository extends JpaRepository<ServicioAlo
      * Contar alojamientos que usan un servicio
      */
     @Query("SELECT COUNT(a) FROM Alojamiento a JOIN a.servicios s WHERE s.id = :servicioId")
-    Long countAlojamientosByServicioId(@Param("servicioId") Long servicioId);
+    Long countAlojamientosByServicioId(@Param("servicioId") Integer servicioId);
 }

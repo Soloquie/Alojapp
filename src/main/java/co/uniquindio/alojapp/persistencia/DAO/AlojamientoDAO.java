@@ -45,7 +45,7 @@ public class AlojamientoDAO {
      * RN5: Capacidad mayor a 0
      * RN6: Ubicación válida
      */
-    public AlojamientoDTO save(CrearAlojamientoRequest request, Long anfitrionId) {
+    public AlojamientoDTO save(CrearAlojamientoRequest request, Integer anfitrionId) {
         Anfitrion anfitrion = anfitrionRepository.findById(anfitrionId)
                 .orElseThrow(() -> new RuntimeException("Anfitrión no encontrado"));
 
@@ -78,7 +78,7 @@ public class AlojamientoDAO {
     /**
      * Buscar alojamiento por ID
      */
-    public Optional<AlojamientoDTO> findById(Long id) {
+    public Optional<AlojamientoDTO> findById(Integer id) {
         return alojamientoRepository.findById(id)
                 .map(alojamientoMapper::toDTO);
     }
@@ -86,7 +86,7 @@ public class AlojamientoDAO {
     /**
      * Buscar entity por ID (uso interno)
      */
-    public Optional<Alojamiento> findEntityById(Long id) {
+    public Optional<Alojamiento> findEntityById(Integer id) {
         return alojamientoRepository.findById(id);
     }
 
@@ -105,13 +105,13 @@ public class AlojamientoDAO {
     /**
      * Buscar alojamientos por anfitrión
      */
-    public List<AlojamientoDTO> findByAnfitrion(Long anfitrionId) {
+    public List<AlojamientoDTO> findByAnfitrion(Integer anfitrionId) {
         return alojamientoMapper.toDTOList(
                 alojamientoRepository.findByAnfitrionId(anfitrionId)
         );
     }
 
-    public PaginacionResponse<AlojamientoDTO> findByAnfitrion(Long anfitrionId, int pagina, int tamanoPagina) {
+    public PaginacionResponse<AlojamientoDTO> findByAnfitrion(Integer anfitrionId, int pagina, int tamanoPagina) {
         Pageable pageable = PageRequest.of(pagina, tamanoPagina);
         Page<Alojamiento> page = alojamientoRepository.findByAnfitrionId(anfitrionId, pageable);
 
@@ -155,7 +155,7 @@ public class AlojamientoDAO {
      * Verificar disponibilidad
      * RN14: Validar no solapamiento
      */
-    public boolean verificarDisponibilidad(Long alojamientoId,
+    public boolean verificarDisponibilidad(Integer alojamientoId,
                                            java.time.LocalDate fechaCheckin,
                                            java.time.LocalDate fechaCheckout) {
         return alojamientoRepository.estaDisponible(alojamientoId, fechaCheckin, fechaCheckout);
@@ -165,7 +165,7 @@ public class AlojamientoDAO {
      * Actualizar alojamiento
      * RN18: Solo el propietario puede modificar
      */
-    public Optional<AlojamientoDTO> actualizar(Long id, ActualizarAlojamientoRequest request, Long anfitrionId) {
+    public Optional<AlojamientoDTO> actualizar(Integer id, ActualizarAlojamientoRequest request, Integer anfitrionId) {
         return alojamientoRepository.findById(id)
                 .filter(a -> a.getAnfitrion().getId().equals(anfitrionId)) // Validar propietario
                 .map(alojamiento -> {
@@ -206,7 +206,7 @@ public class AlojamientoDAO {
      * RN21: Solo si no tiene reservas futuras
      * RN22: Soft delete manteniendo historial
      */
-    public boolean eliminar(Long id, Long anfitrionId) {
+    public boolean eliminar(Integer id, Integer anfitrionId) {
         return alojamientoRepository.findById(id)
                 .filter(a -> a.getAnfitrion().getId().equals(anfitrionId)) // Validar propietario
                 .map(alojamiento -> {
@@ -257,7 +257,7 @@ public class AlojamientoDAO {
     /**
      * Verificar si tiene reservas futuras
      */
-    public boolean tieneReservasFuturas(Long alojamientoId) {
+    public boolean tieneReservasFuturas(Integer alojamientoId) {
         return alojamientoRepository.tieneReservasFuturas(alojamientoId);
     }
 

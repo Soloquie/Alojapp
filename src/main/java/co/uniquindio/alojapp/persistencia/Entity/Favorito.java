@@ -18,16 +18,17 @@ public class Favorito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "favorito_id")
     @Schema(description = "Identificador único del registro de favorito", example = "1")
-    private Long id;
+    private Integer id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)   // <-- FK real
     @Schema(description = "Usuario que marcó el alojamiento como favorito")
     private Usuario usuario;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "alojamiento_id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "alojamiento_id", nullable = false) // <-- FK real
     @Schema(description = "Alojamiento marcado como favorito por el usuario")
     private Alojamiento alojamiento;
 

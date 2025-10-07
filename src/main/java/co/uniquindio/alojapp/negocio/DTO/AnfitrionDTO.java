@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class AnfitrionDTO {
 
     @Schema(description = "Identificador único del anfitrión", example = "12")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Nombre completo del anfitrión", example = "María López")
     private String nombre;

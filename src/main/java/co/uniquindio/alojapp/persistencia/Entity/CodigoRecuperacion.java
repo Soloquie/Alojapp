@@ -20,7 +20,7 @@ public class CodigoRecuperacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_id")
     @Schema(description = "Identificador único del código de recuperación", example = "1")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)

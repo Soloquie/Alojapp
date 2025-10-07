@@ -21,7 +21,7 @@ public class Comentario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comentario_id")
     @Schema(description = "Identificador único del comentario", example = "100")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reserva_id", nullable = false)

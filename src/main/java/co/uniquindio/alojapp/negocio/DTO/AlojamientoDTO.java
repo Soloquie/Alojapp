@@ -19,7 +19,7 @@ import java.util.List;
 public class AlojamientoDTO {
 
     @Schema(description = "ID del alojamiento", example = "10")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Título del alojamiento", example = "Casa de playa en Cartagena")
     private String titulo;

@@ -53,7 +53,7 @@ public class UsuarioDAO {
     /**
      * Buscar usuario por ID
      */
-    public Optional<UsuarioDTO> findById(Long id) {
+    public Optional<UsuarioDTO> findById(Integer id) {
         return usuarioRepository.findById(id)
                 .map(usuarioMapper::toDTO);
     }
@@ -61,7 +61,7 @@ public class UsuarioDAO {
     /**
      * Buscar usuario entity por ID (para uso interno)
      */
-    public Optional<Usuario> findEntityById(Long id) {
+    public Optional<Usuario> findEntityById(Integer id) {
         return usuarioRepository.findById(id);
     }
 
@@ -92,7 +92,7 @@ public class UsuarioDAO {
      * Verificar email único excluyendo un usuario
      * Para updates
      */
-    public boolean existsByEmailExceptUser(String email, Long userId) {
+    public boolean existsByEmailExceptUser(String email, Integer userId) {
         return usuarioRepository.existsByEmailAndIdNot(email.toLowerCase(), userId);
     }
 
@@ -122,7 +122,7 @@ public class UsuarioDAO {
     /**
      * Actualizar perfil de usuario
      */
-    public Optional<UsuarioDTO> actualizarPerfil(Long id, ActualizarPerfilRequest request) {
+    public Optional<UsuarioDTO> actualizarPerfil(Integer id, ActualizarPerfilRequest request) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     if (request.getNombre() != null) {
@@ -145,7 +145,7 @@ public class UsuarioDAO {
     /**
      * Actualizar contraseña
      */
-    public boolean actualizarPassword(Long id, String nuevaPasswordEncriptada) {
+    public boolean actualizarPassword(Integer id, String nuevaPasswordEncriptada) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     usuario.setContrasenaHash(nuevaPasswordEncriptada);
@@ -158,7 +158,7 @@ public class UsuarioDAO {
     /**
      * Actualizar fecha última conexión
      */
-    public void actualizarUltimaConexion(Long id) {
+    public void actualizarUltimaConexion(Integer id) {
         usuarioRepository.findById(id)
                 .ifPresent(usuario -> {
                     usuario.setFechaUltimaConexion(LocalDateTime.now());
@@ -169,7 +169,7 @@ public class UsuarioDAO {
     /**
      * Cambiar estado de usuario
      */
-    public Optional<UsuarioDTO> cambiarEstado(Long id, EstadoUsuario nuevoEstado) {
+    public Optional<UsuarioDTO> cambiarEstado(Integer id, EstadoUsuario nuevoEstado) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     usuario.setEstado(nuevoEstado);
@@ -181,7 +181,7 @@ public class UsuarioDAO {
     /**
      * Eliminar usuario (soft delete - cambiar a INACTIVO)
      */
-    public boolean desactivar(Long id) {
+    public boolean desactivar(Integer id) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     usuario.setEstado(EstadoUsuario.INACTIVO);
@@ -208,7 +208,7 @@ public class UsuarioDAO {
     /**
      * Verificar si es anfitrión
      */
-    public boolean esAnfitrion(Long usuarioId) {
+    public boolean esAnfitrion(Integer usuarioId) {
         return usuarioRepository.findById(usuarioId)
                 .map(u -> u.getPerfilAnfitrion() != null)
                 .orElse(false);
@@ -217,7 +217,7 @@ public class UsuarioDAO {
     /**
      * Verificar si es administrador
      */
-    public boolean esAdministrador(Long usuarioId) {
+    public boolean esAdministrador(Integer usuarioId) {
         return usuarioRepository.findById(usuarioId)
                 .map(u -> u.getPerfilAdministrador() != null)
                 .orElse(false);

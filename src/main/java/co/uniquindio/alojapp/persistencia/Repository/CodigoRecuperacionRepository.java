@@ -15,12 +15,12 @@ import java.util.Optional;
  * Implementa RN13: Los códigos expiran en 15 minutos
  */
 @Repository
-public interface CodigoRecuperacionRepository extends JpaRepository<CodigoRecuperacion, Long> {
+public interface CodigoRecuperacionRepository extends JpaRepository<CodigoRecuperacion, Integer> {
 
     /**
      * Buscar código por usuario y código
      */
-    Optional<CodigoRecuperacion> findByUsuarioIdAndCodigo(Long usuarioId, String codigo);
+    Optional<CodigoRecuperacion> findByUsuarioIdAndCodigo(Integer usuarioId, String codigo);
 
     /**
      * Buscar código válido (no usado y no expirado)
@@ -31,7 +31,7 @@ public interface CodigoRecuperacionRepository extends JpaRepository<CodigoRecupe
             "AND c.usado = false " +
             "AND c.fechaExpiracion > :now")
     Optional<CodigoRecuperacion> findCodigoValido(
-            @Param("usuarioId") Long usuarioId,
+            @Param("usuarioId") Integer usuarioId,
             @Param("codigo") String codigo,
             @Param("now") LocalDateTime now
     );
@@ -39,12 +39,12 @@ public interface CodigoRecuperacionRepository extends JpaRepository<CodigoRecupe
     /**
      * Buscar códigos por usuario
      */
-    List<CodigoRecuperacion> findByUsuarioIdOrderByFechaExpiracionDesc(Long usuarioId);
+    List<CodigoRecuperacion> findByUsuarioIdOrderByFechaExpiracionDesc(Integer usuarioId);
 
     /**
      * Buscar códigos no usados de un usuario
      */
-    List<CodigoRecuperacion> findByUsuarioIdAndUsado(Long usuarioId, Boolean usado);
+    List<CodigoRecuperacion> findByUsuarioIdAndUsado(Integer usuarioId, Boolean usado);
 
     /**
      * Eliminar códigos expirados
@@ -59,5 +59,5 @@ public interface CodigoRecuperacionRepository extends JpaRepository<CodigoRecupe
             "WHERE c.usuario.id = :usuarioId " +
             "AND c.usado = false " +
             "AND c.fechaExpiracion > :now")
-    Long countCodigosValidosByUsuario(@Param("usuarioId") Long usuarioId, @Param("now") LocalDateTime now);
+    Long countCodigosValidosByUsuario(@Param("usuarioId") Integer usuarioId, @Param("now") LocalDateTime now);
 }

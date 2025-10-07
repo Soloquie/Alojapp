@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class PagoDTO {
 
     @Schema(description = "Identificador único del pago", example = "501")
-    private String id;
+    private Integer id;
 
     @Schema(description = "Identificador de la reserva asociada al pago", example = "25")
     private String reservaId;

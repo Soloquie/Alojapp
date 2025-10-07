@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class NotificacionDTO {
 
     @Schema(description = "Identificador único de la notificación", example = "101")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Título o asunto de la notificación", example = "Reserva confirmada")
     private String titulo;

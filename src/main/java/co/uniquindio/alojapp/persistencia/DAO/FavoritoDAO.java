@@ -31,7 +31,7 @@ public class FavoritoDAO {
     /**
      * Agregar alojamiento a favoritos
      */
-    public FavoritoDTO save(Long usuarioId, Long alojamientoId) {
+    public FavoritoDTO save(Integer usuarioId, Integer alojamientoId) {
         // Validar que no exista ya
         if (favoritoRepository.existsByUsuarioIdAndAlojamientoId(usuarioId, alojamientoId)) {
             throw new RuntimeException("El alojamiento ya está en favoritos");
@@ -56,7 +56,7 @@ public class FavoritoDAO {
     /**
      * Buscar favoritos por usuario
      */
-    public List<FavoritoDTO> findByUsuario(Long usuarioId) {
+    public List<FavoritoDTO> findByUsuario(Integer usuarioId) {
         return favoritoMapper.toDTOList(
                 favoritoRepository.findByUsuarioIdOrderByFechaAgregadoDesc(usuarioId)
         );
@@ -65,7 +65,7 @@ public class FavoritoDAO {
     /**
      * Verificar si es favorito
      */
-    public boolean esFavorito(Long usuarioId, Long alojamientoId) {
+    public boolean esFavorito(Integer usuarioId, Integer alojamientoId) {
         return favoritoRepository.existsByUsuarioIdAndAlojamientoId(usuarioId, alojamientoId);
     }
 
@@ -73,7 +73,7 @@ public class FavoritoDAO {
      * Eliminar de favoritos
      */
     @Transactional
-    public boolean eliminar(Long usuarioId, Long alojamientoId) {
+    public boolean eliminar(Integer usuarioId, Integer alojamientoId) {
         if (favoritoRepository.existsByUsuarioIdAndAlojamientoId(usuarioId, alojamientoId)) {
             favoritoRepository.deleteByUsuarioIdAndAlojamientoId(usuarioId, alojamientoId);
             return true;
@@ -84,7 +84,7 @@ public class FavoritoDAO {
     /**
      * Contar favoritos de un alojamiento
      */
-    public Long countByAlojamiento(Long alojamientoId) {
+    public Long countByAlojamiento(Integer alojamientoId) {
         return favoritoRepository.countByAlojamientoId(alojamientoId);
     }
 

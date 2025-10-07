@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class FavoritoDTO {
 
     @Schema(description = "Identificador único del favorito", example = "102")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "ID del usuario que marcó el alojamiento como favorito", example = "15")
     private Long usuarioId;

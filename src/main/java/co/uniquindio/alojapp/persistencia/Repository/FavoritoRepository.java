@@ -13,27 +13,27 @@ import java.util.Optional;
  * Repositorio para operaciones con favoritos
  */
 @Repository
-public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
+public interface FavoritoRepository extends JpaRepository<Favorito, Integer> {
 
     /**
      * Buscar favoritos de un usuario
      */
-    List<Favorito> findByUsuarioIdOrderByFechaAgregadoDesc(Long usuarioId);
+    List<Favorito> findByUsuarioIdOrderByFechaAgregadoDesc(Integer usuarioId);
 
     /**
      * Buscar favorito específico por usuario y alojamiento
      */
-    Optional<Favorito> findByUsuarioIdAndAlojamientoId(Long usuarioId, Long alojamientoId);
+    Optional<Favorito> findByUsuarioIdAndAlojamientoId(Integer usuarioId, Integer alojamientoId);
 
     /**
      * Verificar si un alojamiento es favorito de un usuario
      */
-    boolean existsByUsuarioIdAndAlojamientoId(Long usuarioId, Long alojamientoId);
+    boolean existsByUsuarioIdAndAlojamientoId(Integer usuarioId, Integer alojamientoId);
 
     /**
      * Contar favoritos de un alojamiento (popularidad)
      */
-    Long countByAlojamientoId(Long alojamientoId);
+    Long countByAlojamientoId(Integer alojamientoId);
 
     /**
      * Buscar alojamientos más agregados a favoritos
@@ -46,5 +46,5 @@ public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
     /**
      * Eliminar favorito por usuario y alojamiento
      */
-    void deleteByUsuarioIdAndAlojamientoId(Long usuarioId, Long alojamientoId);
+    void deleteByUsuarioIdAndAlojamientoId(Integer usuarioId, Integer alojamientoId);
 }

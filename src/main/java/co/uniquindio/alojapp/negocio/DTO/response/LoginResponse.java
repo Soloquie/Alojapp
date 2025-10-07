@@ -20,7 +20,7 @@ public class LoginResponse {
     private String tokenType;
 
     @Schema(description = "ID del usuario autenticado", example = "123")
-    private Long usuarioId;
+    private Integer usuarioId;
 
     @Schema(description = "Nombre del usuario", example = "Juan Pérez")
     private String nombre;

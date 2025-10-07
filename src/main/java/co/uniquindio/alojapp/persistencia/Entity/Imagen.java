@@ -18,7 +18,7 @@ public class Imagen {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "imagen_id")
     @Schema(description = "Identificador único de la imagen", example = "200")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alojamiento_id", nullable = false)

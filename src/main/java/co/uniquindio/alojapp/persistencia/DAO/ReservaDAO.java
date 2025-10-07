@@ -47,7 +47,7 @@ public class ReservaDAO {
      * RN14: Validar no solapamiento
      * RN15: No exceder capacidad
      */
-    public ReservaDTO save(CrearReservaRequest request, Long usuarioId) {
+    public ReservaDTO save(CrearReservaRequest request, Integer usuarioId) {
         // Validaciones
         validarFechas(request.getFechaCheckin(), request.getFechaCheckout());
 
@@ -92,7 +92,7 @@ public class ReservaDAO {
     /**
      * Buscar reserva por ID
      */
-    public Optional<ReservaDTO> findById(Long id) {
+    public Optional<ReservaDTO> findById(Integer id) {
         return reservaRepository.findById(id)
                 .map(reservaMapper::toDTO);
     }
@@ -100,20 +100,20 @@ public class ReservaDAO {
     /**
      * Buscar entity por ID
      */
-    public Optional<Reserva> findEntityById(Long id) {
+    public Optional<Reserva> findEntityById(Integer id) {
         return reservaRepository.findById(id);
     }
 
     /**
      * Buscar reservas por huésped
      */
-    public List<ReservaDTO> findByHuesped(Long huespedId) {
+    public List<ReservaDTO> findByHuesped(Integer huespedId) {
         return reservaMapper.toDTOList(
                 reservaRepository.findByHuespedId(huespedId)
         );
     }
 
-    public PaginacionResponse<ReservaDTO> findByHuesped(Long huespedId, int pagina, int tamanoPagina) {
+    public PaginacionResponse<ReservaDTO> findByHuesped(Integer huespedId, int pagina, int tamanoPagina) {
         Pageable pageable = PageRequest.of(pagina, tamanoPagina, Sort.by("fechaCreacion").descending());
         Page<Reserva> page = reservaRepository.findByHuespedId(huespedId, pageable);
 
@@ -123,7 +123,7 @@ public class ReservaDAO {
     /**
      * Buscar reservas por huésped y estado
      */
-    public List<ReservaDTO> findByHuespedAndEstado(Long huespedId, EstadoReserva estado) {
+    public List<ReservaDTO> findByHuespedAndEstado(Integer huespedId, EstadoReserva estado) {
         return reservaMapper.toDTOList(
                 reservaRepository.findByHuespedIdAndEstado(huespedId, estado)
         );
@@ -132,13 +132,13 @@ public class ReservaDAO {
     /**
      * Buscar reservas por anfitrión
      */
-    public List<ReservaDTO> findByAnfitrion(Long anfitrionId) {
+    public List<ReservaDTO> findByAnfitrion(Integer anfitrionId) {
         return reservaMapper.toDTOList(
                 reservaRepository.findByAnfitrionId(anfitrionId)
         );
     }
 
-    public PaginacionResponse<ReservaDTO> findByAnfitrion(Long anfitrionId, int pagina, int tamanoPagina) {
+    public PaginacionResponse<ReservaDTO> findByAnfitrion(Integer anfitrionId, int pagina, int tamanoPagina) {
         Pageable pageable = PageRequest.of(pagina, tamanoPagina, Sort.by("fechaCreacion").descending());
         Page<Reserva> page = reservaRepository.findByAnfitrionId(anfitrionId, pageable);
 
@@ -148,7 +148,7 @@ public class ReservaDAO {
     /**
      * Buscar reservas por anfitrión y estado
      */
-    public List<ReservaDTO> findByAnfitrionAndEstado(Long anfitrionId, EstadoReserva estado) {
+    public List<ReservaDTO> findByAnfitrionAndEstado(Integer anfitrionId, EstadoReserva estado) {
         return reservaMapper.toDTOList(
                 reservaRepository.findByAnfitrionIdAndEstado(anfitrionId, estado)
         );
@@ -159,7 +159,7 @@ public class ReservaDAO {
      * RN12: Mínimo 48 horas de anticipación
      * RN20: Solo el propietario puede cancelar
      */
-    public Optional<ReservaDTO> cancelar(Long reservaId, Long usuarioId, CancelarReservaRequest request) {
+    public Optional<ReservaDTO> cancelar(Integer reservaId, Integer usuarioId, CancelarReservaRequest request) {
         return reservaRepository.findById(reservaId)
                 .filter(r -> r.getHuesped().getId().equals(usuarioId)) // Validar propietario
                 .map(reserva -> {
@@ -200,7 +200,7 @@ public class ReservaDAO {
      * Buscar reservas completadas sin comentario
      * RN16: Para poder comentar
      */
-    public List<ReservaDTO> findCompletadasSinComentario(Long huespedId) {
+    public List<ReservaDTO> findCompletadasSinComentario(Integer huespedId) {
         return reservaMapper.toDTOList(
                 reservaRepository.findReservasCompletadasSinComentario(huespedId)
         );
@@ -216,11 +216,11 @@ public class ReservaDAO {
     /**
      * Calcular ingresos de anfitrión
      */
-    public BigDecimal calcularIngresosTotales(Long anfitrionId) {
+    public BigDecimal calcularIngresosTotales(Integer anfitrionId) {
         return reservaRepository.calcularIngresosTotales(anfitrionId);
     }
 
-    public BigDecimal calcularIngresosPorPeriodo(Long anfitrionId, LocalDate inicio, LocalDate fin) {
+    public BigDecimal calcularIngresosPorPeriodo(Integer anfitrionId, LocalDate inicio, LocalDate fin) {
         return reservaRepository.calcularIngresosPorPeriodo(anfitrionId, inicio, fin);
     }
 

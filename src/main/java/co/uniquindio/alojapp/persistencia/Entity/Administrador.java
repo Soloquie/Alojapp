@@ -20,7 +20,7 @@ public class Administrador {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "administrador_id")
     @Schema(description = "Identificador único del administrador", example = "1")
-    private Long id;
+    private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)

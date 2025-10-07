@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class UsuarioDTO {
 
     @Schema(description = "ID del usuario", example = "123")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Nombre completo", example = "Juan Pérez")
     private String nombre;

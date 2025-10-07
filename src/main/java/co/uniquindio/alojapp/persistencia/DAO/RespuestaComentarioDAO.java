@@ -33,7 +33,7 @@ public class RespuestaComentarioDAO {
      * Crear respuesta a un comentario
      * RN19: Solo el anfitrión propietario puede responder
      */
-    public RespuestaComentarioDTO save(Long comentarioId, ResponderComentarioRequest request, Long anfitrionId) {
+    public RespuestaComentarioDTO save(Integer comentarioId, ResponderComentarioRequest request, Integer anfitrionId) {
         Comentario comentario = comentarioRepository.findById(comentarioId)
                 .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
 
@@ -59,7 +59,7 @@ public class RespuestaComentarioDAO {
     /**
      * Buscar respuesta por ID
      */
-    public Optional<RespuestaComentarioDTO> findById(Long id) {
+    public Optional<RespuestaComentarioDTO> findById(Integer id) {
         return respuestaRepository.findById(id)
                 .map(respuestaMapper::toDTO);
     }
@@ -67,7 +67,7 @@ public class RespuestaComentarioDAO {
     /**
      * Buscar respuestas por comentario
      */
-    public List<RespuestaComentarioDTO> findByComentario(Long comentarioId) {
+    public List<RespuestaComentarioDTO> findByComentario(Integer comentarioId) {
         return respuestaMapper.toDTOList(
                 respuestaRepository.findByComentarioId(comentarioId)
         );
@@ -76,7 +76,7 @@ public class RespuestaComentarioDAO {
     /**
      * Buscar respuestas por anfitrión
      */
-    public List<RespuestaComentarioDTO> findByAnfitrion(Long anfitrionId) {
+    public List<RespuestaComentarioDTO> findByAnfitrion(Integer anfitrionId) {
         return respuestaMapper.toDTOList(
                 respuestaRepository.findByAnfitrionId(anfitrionId)
         );
@@ -85,14 +85,14 @@ public class RespuestaComentarioDAO {
     /**
      * Verificar si ya existe respuesta del anfitrión
      */
-    public boolean existeRespuestaAnfitrion(Long comentarioId, Long anfitrionId) {
+    public boolean existeRespuestaAnfitrion(Integer comentarioId, Integer anfitrionId) {
         return respuestaRepository.existeRespuestaAnfitrion(comentarioId, anfitrionId);
     }
 
     /**
      * Contar respuestas de un anfitrión
      */
-    public Long countByAnfitrion(Long anfitrionId) {
+    public Long countByAnfitrion(Integer anfitrionId) {
         return respuestaRepository.countByAnfitrionId(anfitrionId);
     }
 }

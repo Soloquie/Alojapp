@@ -18,7 +18,7 @@ public class Notificacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Identificador único de la notificación", example = "301")
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
     @Schema(description = "Título o asunto de la notificación", example = "Reserva Confirmada")

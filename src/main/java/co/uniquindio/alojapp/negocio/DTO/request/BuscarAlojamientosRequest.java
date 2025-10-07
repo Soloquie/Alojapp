@@ -43,7 +43,7 @@ public class BuscarAlojamientosRequest {
     private Integer capacidadMinima;
 
     @Schema(description = "Lista de IDs de servicios requeridos", example = "[1, 3, 7]")
-    private List<Long> serviciosIds;
+    private List<Integer> serviciosIds;
 
     @Builder.Default
     @Min(value = 0, message = "La página no puede ser negativa")

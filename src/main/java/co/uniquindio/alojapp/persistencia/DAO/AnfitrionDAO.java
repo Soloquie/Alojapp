@@ -47,7 +47,7 @@ public class AnfitrionDAO {
     /**
      * Buscar anfitrión por ID
      */
-    public Optional<AnfitrionDTO> findById(Long id) {
+    public Optional<AnfitrionDTO> findById(Integer id) {
         return anfitrionRepository.findById(id)
                 .map(anfitrionMapper::toDTO);
     }
@@ -55,14 +55,14 @@ public class AnfitrionDAO {
     /**
      * Buscar entity por ID (uso interno)
      */
-    public Optional<Anfitrion> findEntityById(Long id) {
+    public Optional<Anfitrion> findEntityById(Integer id) {
         return anfitrionRepository.findById(id);
     }
 
     /**
      * Buscar anfitrión por usuario ID
      */
-    public Optional<AnfitrionDTO> findByUsuarioId(Long usuarioId) {
+    public Optional<AnfitrionDTO> findByUsuarioId(Integer usuarioId) {
         return anfitrionRepository.findByUsuarioId(usuarioId)
                 .map(anfitrionMapper::toDTO);
     }
@@ -70,7 +70,7 @@ public class AnfitrionDAO {
     /**
      * Verificar si usuario es anfitrión
      */
-    public boolean existsByUsuarioId(Long usuarioId) {
+    public boolean existsByUsuarioId(Integer usuarioId) {
         return anfitrionRepository.existsByUsuarioId(usuarioId);
     }
 
@@ -91,7 +91,7 @@ public class AnfitrionDAO {
     /**
      * Actualizar anfitrión
      */
-    public Optional<AnfitrionDTO> actualizar(Long id, String descripcion, String documentosUrl) {
+    public Optional<AnfitrionDTO> actualizar(Integer id, String descripcion, String documentosUrl) {
         return anfitrionRepository.findById(id)
                 .map(anfitrion -> {
                     if (descripcion != null) {
@@ -108,7 +108,7 @@ public class AnfitrionDAO {
     /**
      * Verificar anfitrión
      */
-    public Optional<AnfitrionDTO> verificar(Long id) {
+    public Optional<AnfitrionDTO> verificar(Integer id) {
         return anfitrionRepository.findById(id)
                 .map(anfitrion -> {
                     anfitrion.setVerificado(true);
@@ -120,14 +120,14 @@ public class AnfitrionDAO {
     /**
      * Contar alojamientos del anfitrión
      */
-    public Long countAlojamientos(Long anfitrionId) {
+    public Long countAlojamientos(Integer anfitrionId) {
         return anfitrionRepository.countAlojamientosByAnfitrionId(anfitrionId);
     }
 
     /**
      * Contar reservas del anfitrión
      */
-    public Long countReservas(Long anfitrionId) {
+    public Long countReservas(Integer anfitrionId) {
         return anfitrionRepository.countReservasByAnfitrionId(anfitrionId);
     }
 

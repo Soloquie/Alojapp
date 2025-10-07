@@ -20,7 +20,7 @@ public class RespuestaComentario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "respuesta_id")
     @Schema(description = "Identificador único de la respuesta", example = "1")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comentario_id", nullable = false)

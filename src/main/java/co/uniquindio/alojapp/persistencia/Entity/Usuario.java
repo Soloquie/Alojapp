@@ -24,7 +24,7 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usuario_id")
     @Schema(description = "Identificador único del usuario", example = "1")
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length = 100)
     @NotBlank(message = "El nombre es obligatorio")

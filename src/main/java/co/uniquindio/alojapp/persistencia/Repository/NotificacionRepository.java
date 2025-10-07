@@ -14,36 +14,36 @@ import java.util.List;
  * Implementa RN26-RN29: Sistema de notificaciones
  */
 @Repository
-public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
+public interface NotificacionRepository extends JpaRepository<Notificacion, Integer> {
 
     /**
      * Buscar notificaciones por usuario
      */
-    List<Notificacion> findByUsuarioIdOrderByFechaEnvioDesc(Long usuarioId);
+    List<Notificacion> findByUsuarioIdOrderByFechaEnvioDesc(Integer usuarioId);
 
     /**
      * Buscar notificaciones no leídas por usuario
      */
-    List<Notificacion> findByUsuarioIdAndLeidaOrderByFechaEnvioDesc(Long usuarioId, Boolean leida);
+    List<Notificacion> findByUsuarioIdAndLeidaOrderByFechaEnvioDesc(Integer usuarioId, Boolean leida);
 
     /**
      * Contar notificaciones no leídas
      */
-    Long countByUsuarioIdAndLeida(Long usuarioId, Boolean leida);
+    Long countByUsuarioIdAndLeida(Integer usuarioId, Boolean leida);
 
     /**
      * Marcar notificación como leída
      */
     @Modifying
     @Query("UPDATE Notificacion n SET n.leida = true WHERE n.id = :notificacionId")
-    void marcarComoLeida(@Param("notificacionId") Long notificacionId);
+    void marcarComoLeida(@Param("notificacionId") Integer notificacionId);
 
     /**
      * Marcar todas las notificaciones de un usuario como leídas
      */
     @Modifying
     @Query("UPDATE Notificacion n SET n.leida = true WHERE n.usuario.id = :usuarioId AND n.leida = false")
-    void marcarTodasComoLeidas(@Param("usuarioId") Long usuarioId);
+    void marcarTodasComoLeidas(@Param("usuarioId") Integer usuarioId);
 
     /**
      * Eliminar notificaciones antiguas leídas

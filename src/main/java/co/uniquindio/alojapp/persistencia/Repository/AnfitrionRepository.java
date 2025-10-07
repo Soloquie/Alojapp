@@ -13,17 +13,17 @@ import java.util.Optional;
  * Repositorio para operaciones con anfitriones
  */
 @Repository
-public interface AnfitrionRepository extends JpaRepository<Anfitrion, Long> {
+public interface AnfitrionRepository extends JpaRepository<Anfitrion, Integer> {
 
     /**
      * Buscar anfitrión por ID de usuario
      */
-    Optional<Anfitrion> findByUsuarioId(Long usuarioId);
+    Optional<Anfitrion> findByUsuarioId(Integer usuarioId);
 
     /**
      * Verificar si un usuario ya es anfitrión
      */
-    boolean existsByUsuarioId(Long usuarioId);
+    boolean existsByUsuarioId(Integer usuarioId);
 
     /**
      * Buscar anfitriones verificados
@@ -46,7 +46,7 @@ public interface AnfitrionRepository extends JpaRepository<Anfitrion, Long> {
      * Contar alojamientos por anfitrión
      */
     @Query("SELECT COUNT(al) FROM Alojamiento al WHERE al.anfitrion.id = :anfitrionId")
-    Long countAlojamientosByAnfitrionId(@Param("anfitrionId") Long anfitrionId);
+    Long countAlojamientosByAnfitrionId(@Param("anfitrionId") Integer anfitrionId);
 
     /**
      * Obtener anfitriones con mejor calificación promedio
@@ -64,7 +64,7 @@ public interface AnfitrionRepository extends JpaRepository<Anfitrion, Long> {
      * Contar reservas totales de un anfitrión (en todos sus alojamientos)
      */
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.alojamiento.anfitrion.id = :anfitrionId")
-    Long countReservasByAnfitrionId(@Param("anfitrionId") Long anfitrionId);
+    Long countReservasByAnfitrionId(@Param("anfitrionId") Integer anfitrionId);
 
     /**
      * Buscar anfitriones por ciudad de sus alojamientos

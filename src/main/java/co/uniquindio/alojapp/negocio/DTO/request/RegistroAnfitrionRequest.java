@@ -14,7 +14,7 @@ public class RegistroAnfitrionRequest {
 
     @NotNull(message = "El ID de usuario es obligatorio")
     @Schema(description = "ID del usuario base", example = "5")
-    private Long usuarioId;
+    private Integer usuarioId;
 
     @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres")
     @Schema(description = "Descripción personal del anfitrión",

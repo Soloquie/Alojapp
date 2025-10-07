@@ -18,7 +18,7 @@ import java.util.List;
  * Implementa RN23, RN24, RN25 (búsqueda y filtrado)
  */
 @Repository
-public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> {
+public interface AlojamientoRepository extends JpaRepository<Alojamiento, Integer> {
 
     /**
      * Buscar alojamientos por estado
@@ -43,9 +43,9 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
     /**
      * Buscar por anfitrión
      */
-    List<Alojamiento> findByAnfitrionId(Long anfitrionId);
+    List<Alojamiento> findByAnfitrionId(Integer anfitrionId);
 
-    Page<Alojamiento> findByAnfitrionId(Long anfitrionId, Pageable pageable);
+    Page<Alojamiento> findByAnfitrionId(Integer anfitrionId, Pageable pageable);
 
     /**
      * Buscar por rango de precio
@@ -94,7 +94,7 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
             @Param("precioMin") BigDecimal precioMin,
             @Param("precioMax") BigDecimal precioMax,
             @Param("capacidad") Integer capacidad,
-            @Param("serviciosIds") List<Long> serviciosIds,
+            @Param("serviciosIds") List<Integer> serviciosIds,
             @Param("fechaCheckin") LocalDate fechaCheckin,
             @Param("fechaCheckout") LocalDate fechaCheckout,
             Pageable pageable
@@ -111,7 +111,7 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
             "     OR (:fechaCheckout BETWEEN r.fechaCheckin AND r.fechaCheckout) " +
             "     OR (r.fechaCheckin BETWEEN :fechaCheckin AND :fechaCheckout))")
     boolean estaDisponible(
-            @Param("alojamientoId") Long alojamientoId,
+            @Param("alojamientoId") Integer alojamientoId,
             @Param("fechaCheckin") LocalDate fechaCheckin,
             @Param("fechaCheckout") LocalDate fechaCheckout
     );
@@ -151,7 +151,6 @@ public interface AlojamientoRepository extends JpaRepository<Alojamiento, Long> 
      */
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Reserva r " +
             "WHERE r.alojamiento.id = :alojamientoId " +
-            "AND r.fechaCheckin > CURRENT_DATE " +
-            "AND r.estado IN ('CONFIRMADA', 'PENDIENTE')")
-    boolean tieneReservasFuturas(@Param("alojamientoId") Long alojamientoId);
+            "AND r.fechaCheckin > CURRENT_DATE " )
+    boolean tieneReservasFuturas(@Param("alojamientoId") Integer alojamientoId);
 }

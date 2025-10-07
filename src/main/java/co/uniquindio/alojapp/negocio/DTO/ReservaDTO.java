@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class ReservaDTO {
 
     @Schema(description = "ID de la reserva", example = "45")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "ID del alojamiento", example = "10")
     private Long alojamientoId;

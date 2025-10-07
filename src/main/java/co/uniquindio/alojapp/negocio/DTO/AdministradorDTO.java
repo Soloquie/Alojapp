@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class AdministradorDTO {
 
     @Schema(description = "Identificador único del administrador", example = "1")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Nombre completo del administrador", example = "Carlos Gómez")
     private String nombre;

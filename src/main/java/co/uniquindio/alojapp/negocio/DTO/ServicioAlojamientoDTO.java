@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ServicioAlojamientoDTO {
 
     @Schema(description = "Identificador único del servicio", example = "7")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Nombre del servicio", example = "Piscina privada")
     private String nombre;

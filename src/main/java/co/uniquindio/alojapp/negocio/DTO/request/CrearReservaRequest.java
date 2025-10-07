@@ -18,7 +18,7 @@ public class CrearReservaRequest {
 
     @NotNull(message = "El ID del alojamiento es obligatorio")
     @Schema(description = "ID del alojamiento a reservar", example = "10")
-    private Long alojamientoId;
+    private Integer alojamientoId;
 
     @NotNull(message = "La fecha de check-in es obligatoria")
     @FutureOrPresent(message = "La fecha de check-in debe ser presente o futura")

@@ -15,17 +15,17 @@ import java.util.Optional;
  * Repositorio para operaciones con pagos
  */
 @Repository
-public interface PagoRepository extends JpaRepository<Pago, Long> {
+public interface PagoRepository extends JpaRepository<Pago, Integer> {
 
     /**
      * Buscar pago por reserva
      */
-    Optional<Pago> findByReservaId(Long reservaId);
+    Optional<Pago> findByReservaId(Integer reservaId);
 
     /**
      * Buscar pagos por usuario
      */
-    List<Pago> findByUsuarioIdOrderByFechaPagoDesc(Long usuarioId);
+    List<Pago> findByUsuarioIdOrderByFechaPagoDesc(Integer usuarioId);
 
     /**
      * Buscar pagos por estado
@@ -46,7 +46,7 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
      * Calcular monto total de pagos por usuario
      */
     @Query("SELECT SUM(p.monto) FROM Pago p WHERE p.usuario.id = :usuarioId AND p.estado = 'APROBADO'")
-    BigDecimal calcularTotalPagadoPorUsuario(@Param("usuarioId") Long usuarioId);
+    BigDecimal calcularTotalPagadoPorUsuario(@Param("usuarioId") Integer usuarioId);
 
     /**
      * Contar pagos por estado
@@ -59,5 +59,5 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
     @Query("SELECT p FROM Pago p " +
             "WHERE p.reserva.alojamiento.anfitrion.id = :anfitrionId " +
             "AND p.estado = 'APROBADO'")
-    List<Pago> findPagosAprobadosByAnfitrion(@Param("anfitrionId") Long anfitrionId);
+    List<Pago> findPagosAprobadosByAnfitrion(@Param("anfitrionId") Integer anfitrionId);
 }

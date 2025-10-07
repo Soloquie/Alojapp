@@ -17,7 +17,7 @@ import java.util.List;
 public class ComentarioDTO {
 
     @Schema(description = "ID del comentario", example = "100")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "ID de la reserva", example = "25")
     private Long reservaId;

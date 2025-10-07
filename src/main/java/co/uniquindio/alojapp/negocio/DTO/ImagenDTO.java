@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ImagenDTO {
 
     @Schema(description = "Identificador único de la imagen", example = "501")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "URL pública o ruta de la imagen almacenada", example = "https://alojapp.com/images/alojamientos/501.jpg")
     private String url;

@@ -21,7 +21,7 @@ public class Anfitrion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "anfitrion_id")
     @Schema(description = "Identificador único del anfitrión", example = "1")
-    private Long id;
+    private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)

@@ -19,42 +19,42 @@ import java.util.List;
  * Implementa reglas de negocio RN9-RN15, RN30, RN32
  */
 @Repository
-public interface ReservaRepository extends JpaRepository<Reserva, Long> {
+public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
     /**
      * Buscar reservas por huésped
      */
-    List<Reserva> findByHuespedId(Long huespedId);
+    List<Reserva> findByHuespedId(Integer huespedId);
 
-    Page<Reserva> findByHuespedId(Long huespedId, Pageable pageable);
+    Page<Reserva> findByHuespedId(Integer huespedId, Pageable pageable);
 
     /**
      * Buscar reservas por huésped y estado
      */
-    List<Reserva> findByHuespedIdAndEstado(Long huespedId, EstadoReserva estado);
+    List<Reserva> findByHuespedIdAndEstado(Integer huespedId, EstadoReserva estado);
 
-    Page<Reserva> findByHuespedIdAndEstado(Long huespedId, EstadoReserva estado, Pageable pageable);
+    Page<Reserva> findByHuespedIdAndEstado(Integer huespedId, EstadoReserva estado, Pageable pageable);
 
     /**
      * Buscar reservas por alojamiento
      */
-    List<Reserva> findByAlojamientoId(Long alojamientoId);
+    List<Reserva> findByAlojamientoId(Integer alojamientoId);
 
-    Page<Reserva> findByAlojamientoId(Long alojamientoId, Pageable pageable);
+    Page<Reserva> findByAlojamientoId(Integer alojamientoId, Pageable pageable);
 
     /**
      * Buscar reservas por alojamiento y estado
      */
-    List<Reserva> findByAlojamientoIdAndEstado(Long alojamientoId, EstadoReserva estado);
+    List<Reserva> findByAlojamientoIdAndEstado(Integer alojamientoId, EstadoReserva estado);
 
     /**
      * Buscar reservas por anfitrión (a través de alojamiento)
      */
     @Query("SELECT r FROM Reserva r WHERE r.alojamiento.anfitrion.id = :anfitrionId")
-    List<Reserva> findByAnfitrionId(@Param("anfitrionId") Long anfitrionId);
+    List<Reserva> findByAnfitrionId(@Param("anfitrionId") Integer anfitrionId);
 
     @Query("SELECT r FROM Reserva r WHERE r.alojamiento.anfitrion.id = :anfitrionId")
-    Page<Reserva> findByAnfitrionId(@Param("anfitrionId") Long anfitrionId, Pageable pageable);
+    Page<Reserva> findByAnfitrionId(@Param("anfitrionId") Integer anfitrionId, Pageable pageable);
 
     /**
      * Buscar reservas por anfitrión y estado
@@ -63,7 +63,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "WHERE r.alojamiento.anfitrion.id = :anfitrionId " +
             "AND r.estado = :estado")
     List<Reserva> findByAnfitrionIdAndEstado(
-            @Param("anfitrionId") Long anfitrionId,
+            @Param("anfitrionId") Integer anfitrionId,
             @Param("estado") EstadoReserva estado
     );
 
@@ -93,7 +93,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "WHERE r.huesped.id = :huespedId " +
             "AND r.estado = 'COMPLETADA' " +
             "AND SIZE(r.comentarios) = 0")
-    List<Reserva> findReservasCompletadasSinComentario(@Param("huespedId") Long huespedId);
+    List<Reserva> findReservasCompletadasSinComentario(@Param("huespedId") Integer huespedId);
 
     /**
      * Verificar solapamiento de reservas
@@ -106,7 +106,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "     OR (:fechaCheckout BETWEEN r.fechaCheckin AND r.fechaCheckout) " +
             "     OR (r.fechaCheckin BETWEEN :fechaCheckin AND :fechaCheckout))")
     boolean existeSolapamiento(
-            @Param("alojamientoId") Long alojamientoId,
+            @Param("alojamientoId") Integer alojamientoId,
             @Param("fechaCheckin") LocalDate fechaCheckin,
             @Param("fechaCheckout") LocalDate fechaCheckout
     );
@@ -128,7 +128,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     /**
      * Contar reservas de un huésped por estado
      */
-    Long countByHuespedIdAndEstado(Long huespedId, EstadoReserva estado);
+    Long countByHuespedIdAndEstado(Integer huespedId, EstadoReserva estado);
 
     /**
      * Calcular ingresos totales de un anfitrión
@@ -136,7 +136,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     @Query("SELECT SUM(r.precioTotal) FROM Reserva r " +
             "WHERE r.alojamiento.anfitrion.id = :anfitrionId " +
             "AND r.estado = 'COMPLETADA'")
-    BigDecimal calcularIngresosTotales(@Param("anfitrionId") Long anfitrionId);
+    BigDecimal calcularIngresosTotales(@Param("anfitrionId") Integer anfitrionId);
 
     /**
      * Calcular ingresos en un período
@@ -146,7 +146,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "AND r.estado = 'COMPLETADA' " +
             "AND r.fechaCheckout BETWEEN :fechaInicio AND :fechaFin")
     BigDecimal calcularIngresosPorPeriodo(
-            @Param("anfitrionId") Long anfitrionId,
+            @Param("anfitrionId") Integer anfitrionId,
             @Param("fechaInicio") LocalDate fechaInicio,
             @Param("fechaFin") LocalDate fechaFin
     );

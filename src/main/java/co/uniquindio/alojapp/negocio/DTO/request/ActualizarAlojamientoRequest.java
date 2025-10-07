@@ -43,5 +43,5 @@ public class ActualizarAlojamientoRequest {
     private String estado;
 
     @Schema(description = "Lista de IDs de servicios ofrecidos")
-    private List<Long> serviciosIds;
+    private List<Integer> serviciosIds;
 }

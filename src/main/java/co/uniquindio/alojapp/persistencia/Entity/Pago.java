@@ -18,7 +18,7 @@ public class Pago {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Identificador único del pago", example = "501")
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
     @Schema(description = "Monto total pagado por la reserva", example = "700000.00")

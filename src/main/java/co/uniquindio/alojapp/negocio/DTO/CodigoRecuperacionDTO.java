@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class CodigoRecuperacionDTO {
 
     @Schema(description = "ID del código", example = "1")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "ID del usuario", example = "123")
     private Long usuarioId;

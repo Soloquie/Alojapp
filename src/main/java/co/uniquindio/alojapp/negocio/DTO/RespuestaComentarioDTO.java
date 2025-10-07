@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class RespuestaComentarioDTO {
 
     @Schema(description = "Identificador único de la respuesta", example = "200")
-    private Long id;
+    private Integer id;
 
     @Schema(description = "Contenido de la respuesta", example = "Gracias por tu comentario, te esperamos nuevamente.")
     private String contenido;

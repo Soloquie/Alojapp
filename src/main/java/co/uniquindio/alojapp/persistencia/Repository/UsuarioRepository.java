@@ -16,7 +16,7 @@ import java.util.Optional;
  * Soporta las funcionalidades de huéspedes, anfitriones y administradores
  */
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     /**
      * Buscar usuario por email (para login)
@@ -41,7 +41,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      */
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Usuario u " +
             "WHERE u.email = :email AND u.id != :userId")
-    boolean existsByEmailAndIdNot(@Param("email") String email, @Param("userId") Long userId);
+    boolean existsByEmailAndIdNot(@Param("email") String email, @Param("userId") Integer userId);
 
     /**
      * Buscar usuarios por estado
@@ -90,7 +90,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      * Actualizar fecha de última conexión
      */
     @Query("UPDATE Usuario u SET u.fechaUltimaConexion = :fecha WHERE u.id = :userId")
-    void actualizarFechaUltimaConexion(@Param("userId") Long userId, @Param("fecha") LocalDateTime fecha);
+    void actualizarFechaUltimaConexion(@Param("userId") Integer userId, @Param("fecha") LocalDateTime fecha);
 
     /**
      * Buscar usuarios inactivos (sin conexión en X días)

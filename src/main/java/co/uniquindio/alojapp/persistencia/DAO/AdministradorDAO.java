@@ -27,7 +27,7 @@ public class AdministradorDAO {
     /**
      * Crear nuevo administrador
      */
-    public AdministradorDTO save(Long usuarioId, String nivelAcceso, String permisos) {
+    public AdministradorDTO save(Integer usuarioId, String nivelAcceso, String permisos) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -45,7 +45,7 @@ public class AdministradorDAO {
     /**
      * Buscar administrador por ID
      */
-    public Optional<AdministradorDTO> findById(Long id) {
+    public Optional<AdministradorDTO> findById(Integer id) {
         return administradorRepository.findById(id)
                 .map(administradorMapper::toDTO);
     }
@@ -53,14 +53,14 @@ public class AdministradorDAO {
     /**
      * Buscar entity por ID
      */
-    public Optional<Administrador> findEntityById(Long id) {
+    public Optional<Administrador> findEntityById(Integer id) {
         return administradorRepository.findById(id);
     }
 
     /**
      * Buscar administrador por usuario ID
      */
-    public Optional<AdministradorDTO> findByUsuarioId(Long usuarioId) {
+    public Optional<AdministradorDTO> findByUsuarioId(Integer usuarioId) {
         return administradorRepository.findByUsuarioId(usuarioId)
                 .map(administradorMapper::toDTO);
     }
@@ -68,7 +68,7 @@ public class AdministradorDAO {
     /**
      * Verificar si usuario es administrador
      */
-    public boolean existsByUsuarioId(Long usuarioId) {
+    public boolean existsByUsuarioId(Integer usuarioId) {
         return administradorRepository.existsByUsuarioId(usuarioId);
     }
 
@@ -100,7 +100,7 @@ public class AdministradorDAO {
     /**
      * Actualizar nivel de acceso
      */
-    public Optional<AdministradorDTO> actualizarNivelAcceso(Long id, String nuevoNivel) {
+    public Optional<AdministradorDTO> actualizarNivelAcceso(Integer id, String nuevoNivel) {
         return administradorRepository.findById(id)
                 .map(admin -> {
                     admin.setNivelAcceso(nuevoNivel);
@@ -112,7 +112,7 @@ public class AdministradorDAO {
     /**
      * Actualizar permisos
      */
-    public Optional<AdministradorDTO> actualizarPermisos(Long id, String permisos) {
+    public Optional<AdministradorDTO> actualizarPermisos(Integer id, String permisos) {
         return administradorRepository.findById(id)
                 .map(admin -> {
                     admin.setPermisos(permisos);
@@ -124,7 +124,7 @@ public class AdministradorDAO {
     /**
      * Eliminar administrador
      */
-    public boolean deleteById(Long id) {
+    public boolean deleteById(Integer id) {
         if (administradorRepository.existsById(id)) {
             administradorRepository.deleteById(id);
             return true;

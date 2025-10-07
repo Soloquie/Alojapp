@@ -43,7 +43,7 @@ public class ComentarioDAO {
      * RN7: Máximo 500 caracteres
      * RN8: Calificación 1-5
      */
-    public ComentarioDTO save(CrearComentarioRequest request, Long usuarioId) {
+    public ComentarioDTO save(CrearComentarioRequest request, Integer usuarioId) {
         // Validar que no exista comentario para esta reserva
         if (comentarioRepository.existsByReservaId(request.getReservaId())) {
             throw new RuntimeException("Ya existe un comentario para esta reserva");
@@ -83,7 +83,7 @@ public class ComentarioDAO {
     /**
      * Buscar comentario por ID
      */
-    public Optional<ComentarioDTO> findById(Long id) {
+    public Optional<ComentarioDTO> findById(Integer id) {
         return comentarioRepository.findById(id)
                 .map(comentarioMapper::toDTO);
     }
@@ -91,20 +91,20 @@ public class ComentarioDAO {
     /**
      * Buscar entity por ID
      */
-    public Optional<Comentario> findEntityById(Long id) {
+    public Optional<Comentario> findEntityById(Integer id) {
         return comentarioRepository.findById(id);
     }
 
     /**
      * Buscar comentarios por alojamiento
      */
-    public List<ComentarioDTO> findByAlojamiento(Long alojamientoId) {
+    public List<ComentarioDTO> findByAlojamiento(Integer alojamientoId) {
         return comentarioMapper.toDTOList(
                 comentarioRepository.findByAlojamientoId(alojamientoId)
         );
     }
 
-    public PaginacionResponse<ComentarioDTO> findByAlojamiento(Long alojamientoId, int pagina, int tamanoPagina) {
+    public PaginacionResponse<ComentarioDTO> findByAlojamiento(Integer alojamientoId, int pagina, int tamanoPagina) {
         Pageable pageable = PageRequest.of(pagina, tamanoPagina);
         Page<Comentario> page = comentarioRepository.findByAlojamientoIdOrderByFechaComentarioDesc(
                 alojamientoId, pageable
@@ -116,7 +116,7 @@ public class ComentarioDAO {
     /**
      * Buscar comentarios por usuario
      */
-    public List<ComentarioDTO> findByUsuario(Long usuarioId) {
+    public List<ComentarioDTO> findByUsuario(Integer usuarioId) {
         return comentarioMapper.toDTOList(
                 comentarioRepository.findByAutorId(usuarioId)
         );
@@ -125,13 +125,13 @@ public class ComentarioDAO {
     /**
      * Buscar comentarios por anfitrión (todos sus alojamientos)
      */
-    public List<ComentarioDTO> findByAnfitrion(Long anfitrionId) {
+    public List<ComentarioDTO> findByAnfitrion(Integer anfitrionId) {
         return comentarioMapper.toDTOList(
                 comentarioRepository.findByAnfitrionId(anfitrionId)
         );
     }
 
-    public PaginacionResponse<ComentarioDTO> findByAnfitrion(Long anfitrionId, int pagina, int tamanoPagina) {
+    public PaginacionResponse<ComentarioDTO> findByAnfitrion(Integer anfitrionId, int pagina, int tamanoPagina) {
         Pageable pageable = PageRequest.of(pagina, tamanoPagina);
         Page<Comentario> page = comentarioRepository.findByAnfitrionIdOrderByFechaDesc(
                 anfitrionId, pageable
@@ -143,7 +143,7 @@ public class ComentarioDAO {
     /**
      * Buscar comentarios sin respuesta de un anfitrión
      */
-    public List<ComentarioDTO> findSinRespuestaByAnfitrion(Long anfitrionId) {
+    public List<ComentarioDTO> findSinRespuestaByAnfitrion(Integer anfitrionId) {
         return comentarioMapper.toDTOList(
                 comentarioRepository.findComentariosSinRespuestaByAnfitrion(anfitrionId)
         );
@@ -152,7 +152,7 @@ public class ComentarioDAO {
     /**
      * Calcular calificación promedio de un alojamiento
      */
-    public Double calcularCalificacionPromedio(Long alojamientoId) {
+    public Double calcularCalificacionPromedio(Integer alojamientoId) {
         Double promedio = comentarioRepository.calcularCalificacionPromedio(alojamientoId);
         return promedio != null ? promedio : 0.0;
     }
@@ -160,21 +160,21 @@ public class ComentarioDAO {
     /**
      * Contar comentarios por alojamiento
      */
-    public Long countByAlojamiento(Long alojamientoId) {
+    public Long countByAlojamiento(Integer alojamientoId) {
         return comentarioRepository.countByAlojamientoId(alojamientoId);
     }
 
     /**
      * Verificar si existe comentario para una reserva
      */
-    public boolean existeComentarioParaReserva(Long reservaId) {
+    public boolean existeComentarioParaReserva(Integer reservaId) {
         return comentarioRepository.existsByReservaId(reservaId);
     }
 
     /**
      * Buscar mejores comentarios (calificación 4-5)
      */
-    public List<ComentarioDTO> findMejoresComentarios(Long alojamientoId) {
+    public List<ComentarioDTO> findMejoresComentarios(Integer alojamientoId) {
         return comentarioMapper.toDTOList(
                 comentarioRepository.findMejoresComentarios(alojamientoId)
         );

@@ -30,7 +30,7 @@ public class CodigoRecuperacionDAO {
      * Generar y guardar código de recuperación
      * RN13: Validez de 15 minutos
      */
-    public CodigoRecuperacionDTO generarCodigo(Long usuarioId) {
+    public CodigoRecuperacionDTO generarCodigo(Integer usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -51,7 +51,7 @@ public class CodigoRecuperacionDAO {
     /**
      * Buscar código válido
      */
-    public Optional<CodigoRecuperacionDTO> findCodigoValido(Long usuarioId, String codigo) {
+    public Optional<CodigoRecuperacionDTO> findCodigoValido(Integer usuarioId, String codigo) {
         return codigoRepository.findCodigoValido(usuarioId, codigo, LocalDateTime.now())
                 .map(codigoMapper::toDTO);
     }
@@ -59,7 +59,7 @@ public class CodigoRecuperacionDAO {
     /**
      * Marcar código como usado
      */
-    public boolean marcarComoUsado(Long codigoId) {
+    public boolean marcarComoUsado(Integer codigoId) {
         return codigoRepository.findById(codigoId)
                 .map(codigo -> {
                     codigo.setUsado(true);
@@ -72,7 +72,7 @@ public class CodigoRecuperacionDAO {
     /**
      * Buscar códigos por usuario
      */
-    public List<CodigoRecuperacionDTO> findByUsuario(Long usuarioId) {
+    public List<CodigoRecuperacionDTO> findByUsuario(Integer usuarioId) {
         return codigoMapper.toDTOList(
                 codigoRepository.findByUsuarioIdOrderByFechaExpiracionDesc(usuarioId)
         );
@@ -88,7 +88,7 @@ public class CodigoRecuperacionDAO {
     /**
      * Contar códigos válidos de un usuario
      */
-    public Long countCodigosValidos(Long usuarioId) {
+    public Long countCodigosValidos(Integer usuarioId) {
         return codigoRepository.countCodigosValidosByUsuario(usuarioId, LocalDateTime.now());
     }
 

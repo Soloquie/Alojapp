@@ -13,17 +13,17 @@ import java.util.List;
  * Implementa RN19: Solo el anfitrión propietario puede responder
  */
 @Repository
-public interface RespuestaComentarioRepository extends JpaRepository<RespuestaComentario, Long> {
+public interface RespuestaComentarioRepository extends JpaRepository<RespuestaComentario, Integer> {
 
     /**
      * Buscar respuestas por comentario
      */
-    List<RespuestaComentario> findByComentarioId(Long comentarioId);
+    List<RespuestaComentario> findByComentarioId(Integer comentarioId);
 
     /**
      * Buscar respuestas por anfitrión
      */
-    List<RespuestaComentario> findByAnfitrionId(Long anfitrionId);
+    List<RespuestaComentario> findByAnfitrionId(Integer anfitrionId);
 
     /**
      * Verificar si un comentario ya tiene respuesta del anfitrión
@@ -32,12 +32,12 @@ public interface RespuestaComentarioRepository extends JpaRepository<RespuestaCo
             "WHERE r.comentario.id = :comentarioId " +
             "AND r.anfitrion.id = :anfitrionId")
     boolean existeRespuestaAnfitrion(
-            @Param("comentarioId") Long comentarioId,
-            @Param("anfitrionId") Long anfitrionId
+            @Param("comentarioId") Integer comentarioId,
+            @Param("anfitrionId") Integer anfitrionId
     );
 
     /**
      * Contar respuestas de un anfitrión
      */
-    Long countByAnfitrionId(Long anfitrionId);
+    Long countByAnfitrionId(Integer anfitrionId);
 }

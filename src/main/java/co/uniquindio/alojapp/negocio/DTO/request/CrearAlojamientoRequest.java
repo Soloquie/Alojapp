@@ -66,5 +66,5 @@ public class CrearAlojamientoRequest {
     private List<String> imagenesUrls;
 
     @Schema(description = "Lista de IDs de servicios ofrecidos", example = "[1, 3, 5, 7]")
-    private List<Long> serviciosIds;
+    private List<Integer> serviciosIds;
 }

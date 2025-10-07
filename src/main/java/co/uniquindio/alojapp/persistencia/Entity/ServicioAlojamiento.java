@@ -21,7 +21,7 @@ public class ServicioAlojamiento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "servicio_id")
     @Schema(description = "Identificador único del servicio", example = "1")
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length = 100)
     @NotBlank(message = "El nombre del servicio es obligatorio")

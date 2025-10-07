@@ -16,43 +16,43 @@ import java.util.Optional;
  * Implementa RN7, RN8, RN16, RN17
  */
 @Repository
-public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
+public interface ComentarioRepository extends JpaRepository<Comentario, Integer> {
 
     /**
      * Buscar comentarios por alojamiento
      */
-    List<Comentario> findByAlojamientoId(Long alojamientoId);
+    List<Comentario> findByAlojamientoId(Integer alojamientoId);
 
-    Page<Comentario> findByAlojamientoIdOrderByFechaComentarioDesc(Long alojamientoId, Pageable pageable);
+    Page<Comentario> findByAlojamientoIdOrderByFechaComentarioDesc(Integer alojamientoId, Pageable pageable);
 
     /**
      * Buscar comentarios por usuario
      */
-    List<Comentario> findByAutorId(Long autorId);
+    List<Comentario> findByAutorId(Integer autorId);
 
     /**
      * Buscar comentario por reserva
      * RN17: Solo un comentario por reserva
      */
-    Optional<Comentario> findByReservaId(Long reservaId);
+    Optional<Comentario> findByReservaId(Integer reservaId);
 
     /**
      * Verificar si existe comentario para una reserva
      * RN17: Validación de comentario único
      */
-    boolean existsByReservaId(Long reservaId);
+    boolean existsByReservaId(Integer reservaId);
 
     /**
      * Buscar comentarios por anfitrión (todos sus alojamientos)
      */
     @Query("SELECT c FROM Comentario c WHERE c.alojamiento.anfitrion.id = :anfitrionId")
-    List<Comentario> findByAnfitrionId(@Param("anfitrionId") Long anfitrionId);
+    List<Comentario> findByAnfitrionId(@Param("anfitrionId") Integer anfitrionId);
 
     @Query("SELECT c FROM Comentario c " +
             "WHERE c.alojamiento.anfitrion.id = :anfitrionId " +
             "ORDER BY c.fechaComentario DESC")
     Page<Comentario> findByAnfitrionIdOrderByFechaDesc(
-            @Param("anfitrionId") Long anfitrionId,
+            @Param("anfitrionId") Integer anfitrionId,
             Pageable pageable
     );
 
@@ -71,12 +71,12 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
      * Calcular calificación promedio de un alojamiento
      */
     @Query("SELECT AVG(c.calificacion) FROM Comentario c WHERE c.alojamiento.id = :alojamientoId")
-    Double calcularCalificacionPromedio(@Param("alojamientoId") Long alojamientoId);
+    Double calcularCalificacionPromedio(@Param("alojamientoId") Integer alojamientoId);
 
     /**
      * Contar comentarios por alojamiento
      */
-    Long countByAlojamientoId(Long alojamientoId);
+    Long countByAlojamientoId(Integer alojamientoId);
 
     /**
      * Buscar comentarios sin respuesta del anfitrión
@@ -90,7 +90,7 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
     @Query("SELECT c FROM Comentario c " +
             "WHERE c.alojamiento.anfitrion.id = :anfitrionId " +
             "AND SIZE(c.respuestas) = 0")
-    List<Comentario> findComentariosSinRespuestaByAnfitrion(@Param("anfitrionId") Long anfitrionId);
+    List<Comentario> findComentariosSinRespuestaByAnfitrion(@Param("anfitrionId") Integer anfitrionId);
 
     /**
      * Buscar mejores comentarios (calificación 4-5)
@@ -99,5 +99,5 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
             "WHERE c.alojamiento.id = :alojamientoId " +
             "AND c.calificacion >= 4 " +
             "ORDER BY c.calificacion DESC, c.fechaComentario DESC")
-    List<Comentario> findMejoresComentarios(@Param("alojamientoId") Long alojamientoId);
+    List<Comentario> findMejoresComentarios(@Param("alojamientoId") Integer alojamientoId);
 }

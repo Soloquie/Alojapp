@@ -16,7 +16,7 @@ public class CrearComentarioRequest {
 
     @NotNull(message = "El ID de la reserva es obligatorio")
     @Schema(description = "ID de la reserva completada", example = "25")
-    private Long reservaId;
+    private Integer reservaId;
 
     @NotNull(message = "La calificación es obligatoria")
     @Min(value = 1, message = "La calificación mínima es 1")
