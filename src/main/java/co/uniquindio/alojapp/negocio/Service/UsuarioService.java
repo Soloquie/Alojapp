@@ -2,6 +2,7 @@ package co.uniquindio.alojapp.negocio.Service;
 
 import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
 import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
+import co.uniquindio.alojapp.negocio.DTO.request.RegistrarPerfilAnfitrionRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
 
 import java.util.List;
@@ -55,4 +56,10 @@ public interface UsuarioService {
      * pero dejamos el método para cumplir con la interfaz.
      */
     void delete(Integer id);
+
+    UsuarioDTO promoverAAdmin(Integer usuarioId);
+    void quitarAdmin(Integer usuarioId);
+
+    UsuarioDTO registrarComoAnfitrion(Integer usuarioId, RegistrarPerfilAnfitrionRequest req);
+    void quitarAnfitrion(Integer usuarioId);
 }

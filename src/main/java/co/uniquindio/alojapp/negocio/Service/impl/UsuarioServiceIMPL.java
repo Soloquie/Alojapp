@@ -2,6 +2,7 @@ package co.uniquindio.alojapp.negocio.Service.impl;
 
 import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
 import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
+import co.uniquindio.alojapp.negocio.DTO.request.RegistrarPerfilAnfitrionRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
 import co.uniquindio.alojapp.negocio.Service.UsuarioService;
 import co.uniquindio.alojapp.persistencia.DAO.UsuarioDAO;
@@ -133,14 +134,7 @@ public class UsuarioServiceIMPL implements UsuarioService {
             return;
         }
 
-        // Sugerido en DAO: método simétrico a desactivar()
-        // Implementación típica en DAO:
-        //   public boolean activar(Long id) {
-        //       return usuarioRepository.findById(id)
-        //           .map(u -> { u.setEstado(EstadoUsuario.ACTIVO); usuarioRepository.save(u); return true; })
-        //           .orElse(false);
-        //   }
-        boolean ok = /*usuarioDAO.activar(id)*/ false; // <-- reemplazar por usuarioDAO.activar(id) cuando lo tengas
+        boolean ok = usuarioDAO.activar(id); // <-- reemplazar por usuarioDAO.activar(id) cuando lo tengas
         if (!ok) {
             // Fallback mínimo (si aún no implementas activar en DAO):
             usuario.setEstado(EstadoUsuario.ACTIVO);
@@ -225,4 +219,68 @@ public class UsuarioServiceIMPL implements UsuarioService {
     private String normalizarEmail(String email) {
         return email == null ? null : email.trim().toLowerCase();
     }
+
+    // UsuarioServiceIMPL.java (añade al final de la clase)
+    @Override
+    public UsuarioDTO promoverAAdmin(Integer usuarioId) {
+        Usuario usuario = usuarioDAO.findEntityById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + usuarioId));
+
+        // Si ya es admin, simplemente devuelve el DTO
+        if (usuarioDAO.existeAdminPorUsuarioId(usuarioId)) {
+            return usuarioDAO.findById(usuarioId)
+                    .orElseThrow(() -> new RuntimeException("No se pudo leer el usuario " + usuarioId));
+        }
+
+        // Crear fila en 'administradores'
+        boolean ok = usuarioDAO.crearAdmin(usuarioId); // TODO: implementar en DAO
+        if (!ok) throw new RuntimeException("No se pudo promover a admin el usuario " + usuarioId);
+
+        return usuarioDAO.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("No se pudo leer el usuario " + usuarioId));
+    }
+
+    @Override
+    public void quitarAdmin(Integer usuarioId) {
+        // idempotente: si no es admin, no falla
+        boolean ok = usuarioDAO.eliminarAdmin(usuarioId); // TODO: implementar en DAO
+        if (!ok) throw new RuntimeException("No se pudo quitar rol admin al usuario " + usuarioId);
+    }
+
+    @Override
+    public UsuarioDTO registrarComoAnfitrion(Integer usuarioId, RegistrarPerfilAnfitrionRequest req) {
+        Usuario usuario = usuarioDAO.findEntityById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + usuarioId));
+
+        if (usuarioDAO.existeAnfitrionPorUsuarioId(usuarioId)) {
+            // Ya es anfitrión → devuelve el DTO
+            return usuarioDAO.findById(usuarioId)
+                    .orElseThrow(() -> new RuntimeException("No se pudo leer el usuario " + usuarioId));
+        }
+
+        // Validaciones simples
+        if (req == null) throw new IllegalArgumentException("Datos de perfil de anfitrión requeridos");
+        if (req.getDescripcionPersonal() != null && req.getDescripcionPersonal().length() > 500) {
+            throw new IllegalArgumentException("La descripción personal no puede exceder 500 caracteres");
+        }
+
+        boolean ok = usuarioDAO.crearAnfitrion(
+                usuarioId,
+                req.getDescripcionPersonal(),
+                req.getDocumentosLegalesUrl(),
+                req.getFechaRegistro() // puede ser null; el DAO puede usar NOW()
+        ); // TODO: implementar en DAO
+
+        if (!ok) throw new RuntimeException("No se pudo registrar al usuario como anfitrión");
+
+        return usuarioDAO.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("No se pudo leer el usuario " + usuarioId));
+    }
+
+    @Override
+    public void quitarAnfitrion(Integer usuarioId) {
+        boolean ok = usuarioDAO.eliminarAnfitrion(usuarioId); // TODO: implementar en DAO
+        if (!ok) throw new RuntimeException("No se pudo quitar rol anfitrión al usuario " + usuarioId);
+    }
+
 }

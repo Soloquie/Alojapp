@@ -47,5 +47,5 @@ public class UsuarioDTO {
     private Boolean esAnfitrion;
 
     @Schema(description = "Indica si es administrador", example = "false")
-    private Boolean esAdministrador;
+    private Boolean esAdmin;
 }

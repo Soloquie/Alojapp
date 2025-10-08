@@ -15,62 +15,43 @@ import java.util.Optional;
 @Repository
 public interface AnfitrionRepository extends JpaRepository<Anfitrion, Integer> {
 
-    /**
-     * Buscar anfitrión por ID de usuario
-     */
     Optional<Anfitrion> findByUsuarioId(Integer usuarioId);
 
-    /**
-     * Verificar si un usuario ya es anfitrión
-     */
     boolean existsByUsuarioId(Integer usuarioId);
 
-    /**
-     * Buscar anfitriones verificados
-     */
     List<Anfitrion> findByVerificado(Boolean verificado);
 
-    /**
-     * Buscar anfitriones con al menos un alojamiento
-     */
     @Query("SELECT a FROM Anfitrion a WHERE SIZE(a.alojamientos) > 0")
     List<Anfitrion> findAnfitrionesConAlojamientos();
 
-    /**
-     * Buscar anfitriones sin alojamientos
-     */
+    // (typo corregido en el nombre)
     @Query("SELECT a FROM Anfitrion a WHERE SIZE(a.alojamientos) = 0")
-    List<Anfitrion> findAnfitrioonesSinAlojamientos();
+    List<Anfitrion> findAnfitrionesSinAlojamientos();
 
-    /**
-     * Contar alojamientos por anfitrión
-     */
     @Query("SELECT COUNT(al) FROM Alojamiento al WHERE al.anfitrion.id = :anfitrionId")
     Long countAlojamientosByAnfitrionId(@Param("anfitrionId") Integer anfitrionId);
 
-    /**
-     * Obtener anfitriones con mejor calificación promedio
-     * Calcula el promedio de calificaciones de todos sus alojamientos
-     */
-    @Query("SELECT a FROM Anfitrion a " +
-            "JOIN a.alojamientos al " +
-            "JOIN al.comentarios c " +
-            "GROUP BY a.id " +
-            "HAVING AVG(c.calificacion) >= :calificacionMinima " +
-            "ORDER BY AVG(c.calificacion) DESC")
+    @Query("""
+           SELECT a FROM Anfitrion a
+           JOIN a.alojamientos al
+           JOIN al.comentarios c
+           GROUP BY a.id
+           HAVING AVG(c.calificacion) >= :calificacionMinima
+           ORDER BY AVG(c.calificacion) DESC
+           """)
     List<Anfitrion> findAnfitrionesConMejorCalificacion(@Param("calificacionMinima") Double calificacionMinima);
 
-    /**
-     * Contar reservas totales de un anfitrión (en todos sus alojamientos)
-     */
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.alojamiento.anfitrion.id = :anfitrionId")
     Long countReservasByAnfitrionId(@Param("anfitrionId") Integer anfitrionId);
 
-    /**
-     * Buscar anfitriones por ciudad de sus alojamientos
-     */
-    @Query("SELECT DISTINCT a FROM Anfitrion a " +
-            "JOIN a.alojamientos al " +
-            "WHERE al.ciudad = :ciudad")
+    @Query("""
+           SELECT DISTINCT a FROM Anfitrion a
+           JOIN a.alojamientos al
+           WHERE al.ciudad = :ciudad
+           """)
     List<Anfitrion> findByCiudadAlojamientos(@Param("ciudad") String ciudad);
+
+    // ✅ correcto para Usuario.id
+    @org.springframework.transaction.annotation.Transactional
+    long deleteByUsuarioId(Integer usuarioId);
 }

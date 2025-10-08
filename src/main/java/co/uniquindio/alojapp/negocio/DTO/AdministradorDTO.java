@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,4 +27,13 @@ public class AdministradorDTO {
 
     @Schema(description = "Estado del administrador", example = "ACTIVO")
     private String estado;
+
+    @Schema(description = "Nivel de acceso del administrador")
+    private String nivelAcceso;
+
+   @Schema(description = "Permisos del administrador")
+    private String permisosJson;
+
+   @Schema(description = "Fecha de ser administrador")
+    private LocalDateTime fechaAsignacion;
 }

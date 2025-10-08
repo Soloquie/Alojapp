@@ -39,4 +39,7 @@ public interface AdministradorRepository extends JpaRepository<Administrador, In
      * Contar administradores por nivel
      */
     Long countByNivelAcceso(String nivelAcceso);
+
+    @org.springframework.transaction.annotation.Transactional
+    long deleteByUsuarioId(Integer usuarioId);
 }
