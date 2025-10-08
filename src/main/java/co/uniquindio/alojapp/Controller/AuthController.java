@@ -1,129 +1,90 @@
 package co.uniquindio.alojapp.Controller;
 
+import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
+import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
+import co.uniquindio.alojapp.negocio.DTO.request.RegistroAnfitrionRequest;
+import co.uniquindio.alojapp.negocio.Service.UsuarioService;
+import co.uniquindio.alojapp.negocio.Service.AnfitrionService;
+// la que te propuse
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Autenticación", description = "Endpoints para registrar e iniciar sesión de usuarios")
+@Tag(name = "Autenticación", description = "Login, registro de usuarios y refresh token")
+@RequiredArgsConstructor
 public class AuthController {
 
-    // ===== DTOs simulados para ejemplos =====
-    static class LoginRequest {
-        @Schema(example = "usuario@correo.com")
-        public String email;
-        @Schema(example = "contraseñaSegura123")
-        public String password;
-    }
+    private final UsuarioService usuarioService;
+    private final AnfitrionService anfitrionService;
 
-    static class LoginResponse {
-        @Schema(example = "eyJhbGciOiJIUzI1NiJ9...")
-        public String token;
-        @Schema(example = "Usuario autenticado correctamente")
-        public String mensaje;
-    }
-
-    static class RegistroRequest {
-        @Schema(example = "usuario@correo.com") public String email;
-        @Schema(example = "Juan Pérez") public String nombre;
-        @Schema(example = "contraseñaSegura123") public String password;
-        @Schema(example = "3124567890") public String telefono;
-        @Schema(example = "1998-05-12") public String fechaNacimiento;
-    }
-
-    static class RegistroAnfitrionRequest extends RegistroRequest {
-        @Schema(example = "Descripción personal del anfitrión")
-        public String descripcion;
-        @Schema(example = "CC123456789")
-        public String documentoIdentidad;
-    }
-
-    static class RegistroResponse {
-        @Schema(example = "Usuario registrado exitosamente")
-        public String mensaje;
-    }
-
-    static class RefreshTokenRequest {
-        @Schema(example = "eyJhbGciOiJIUzI1NiJ9.refresh...")
-        public String refreshToken;
-    }
-
-    static class RefreshTokenResponse {
-        @Schema(example = "eyJhbGciOiJIUzI1NiJ9...")
-        public String accessToken;
-    }
-
-    // =========================
-    // ENDPOINT 1: POST /api/auth/login
-    // =========================
+    // ====== LOGIN (placeholder: implementa tu JWT cuando lo tengas) ======
     @PostMapping("/login")
-    @Operation(summary = "Iniciar sesión", description = "Permite a un usuario autenticarse y obtener un token JWT")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Inicio de sesión exitoso",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class),
-                            examples = @ExampleObject(
-                                    value = "{ \"token\": \"eyJhbGciOiJIUzI1NiJ9...\", \"mensaje\": \"Usuario autenticado correctamente\" }"
-                            )
-                    )),
+    @Operation(summary = "Iniciar sesión (JWT)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
     })
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        LoginResponse response = new LoginResponse();
-        response.token = "eyJhbGciOiJIUzI1NiJ9...";
-        response.mensaje = "Usuario autenticado correctamente";
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> login() {
+        // Aquí iría tu authenticate + generación de JWT (cuando integres JWT)
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                .body("TODO: implementar login con JWT");
     }
 
-    // =========================
-    // ENDPOINT 2: POST /api/auth/registro-huesped
-    // =========================
+    // ====== REGISTRO HUESPED ======
     @PostMapping("/registro-huesped")
-    @Operation(summary = "Registrar nuevo huésped", description = "Permite a un usuario registrarse como huésped en la plataforma")
+    @Operation(summary = "Registrar nuevo huésped")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Huésped registrado correctamente"),
+            @ApiResponse(responseCode = "201", description = "Creado",
+                    content = @Content(schema = @Schema(implementation = UsuarioDTO.class))),
+            @ApiResponse(responseCode = "409", description = "Email duplicado"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<RegistroResponse> registrarHuesped(@RequestBody RegistroRequest datos) {
-        RegistroResponse r = new RegistroResponse();
-        r.mensaje = "Usuario registrado exitosamente como HUESPED";
-        return ResponseEntity.status(201).body(r);
+    public ResponseEntity<UsuarioDTO> registrarHuesped(@Valid @RequestBody RegistroUsuarioRequest request) {
+        // UsuarioServiceIMPL.registrar(...) ya valida duplicados y lanza DuplicateEmailException
+        UsuarioDTO creado = usuarioService.registrar(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
-    // =========================
-    // ENDPOINT 3: POST /api/auth/registro-anfitrion
-    // =========================
+    // ====== REGISTRO ANFITRIÓN ======
     @PostMapping("/registro-anfitrion")
-    @Operation(summary = "Registrar nuevo anfitrión", description = "Permite a un usuario registrarse como anfitrión en la plataforma")
+    @Operation(summary = "Registrar nuevo anfitrión (crea el usuario y su perfil de anfitrión)")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Anfitrión registrado correctamente"),
+            @ApiResponse(responseCode = "201", description = "Creado",
+                    content = @Content(schema = @Schema(implementation = UsuarioDTO.class))),
+            @ApiResponse(responseCode = "409", description = "Email duplicado"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<RegistroResponse> registrarAnfitrion(@RequestBody RegistroAnfitrionRequest datos) {
-        RegistroResponse r = new RegistroResponse();
-        r.mensaje = "Usuario registrado exitosamente como ANFITRION";
-        return ResponseEntity.status(201).body(r);
+    public ResponseEntity<UsuarioDTO> registrarAnfitrion(@Valid @RequestBody RegistroAnfitrionRequest request) {
+        // 1) Crear el usuario base (huésped)
+        UsuarioDTO user = usuarioService.registrar(request);
+
+        // 2) Crear el perfil de anfitrión
+        anfitrionService.crearPerfil(
+                user.getId(),
+                request.getDescripcionPersonal(),
+                request.getDocumentosLegalesUrl(),
+                request.getFechaRegistro() // puede ser null
+        );
+
+        // Devuelvo el usuario creado; si tienes un AnfitrionDTO, también puedes retornarlo
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    // =========================
-    // ENDPOINT 4: POST /api/auth/refresh
-    // =========================
+    // ====== REFRESH TOKEN (placeholder) ======
     @PostMapping("/refresh")
-    @Operation(summary = "Refrescar token JWT", description = "Permite obtener un nuevo access token usando un refresh token válido")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Token refrescado correctamente"),
-            @ApiResponse(responseCode = "401", description = "Refresh token inválido o expirado")
-    })
-    public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenRequest datos) {
-        RefreshTokenResponse r = new RefreshTokenResponse();
-        r.accessToken = "eyJhbGciOiJIUzI1NiJ9.newToken...";
-        return ResponseEntity.ok(r);
+    @Operation(summary = "Refrescar token (JWT)")
+    public ResponseEntity<?> refresh() {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                .body("TODO: implementar refresh de JWT");
     }
 }

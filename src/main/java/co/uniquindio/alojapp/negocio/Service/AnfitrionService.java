@@ -3,6 +3,8 @@ package co.uniquindio.alojapp.negocio.Service;
 
 import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
 
+import java.time.LocalDate;
+
 public interface AnfitrionService {
 
     /** Crea (o asegura) el perfil de anfitrión para el usuario. */
@@ -19,4 +21,10 @@ public interface AnfitrionService {
 
     /** Consulta rápida. */
     boolean esAnfitrion(Integer usuarioId);
+
+    /**Crea un perfil de anfitrion*/
+    void crearPerfil(Integer usuarioId,
+                     String descripcionPersonal,
+                     String documentosLegalesUrl,
+                     LocalDate fechaRegistro);
 }

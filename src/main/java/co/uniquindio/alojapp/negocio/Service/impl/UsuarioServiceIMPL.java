@@ -29,6 +29,7 @@ public class UsuarioServiceIMPL implements UsuarioService {
     private final UsuarioDAO usuarioDAO;
     private final PasswordEncoder passwordEncoder; // BCrypt
 
+
     // ====== Reglas de validación alineadas a tu modelo/requests ======
     private static final Pattern EMAIL_REGEX  = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,63}$");
     private static final Pattern PHONE_REGEX  = Pattern.compile("^\\+?[0-9]{10,20}$"); // igual que en Entity/Requests

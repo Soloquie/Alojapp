@@ -6,15 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Request para registro de anfitrión")
-public class RegistroAnfitrionRequest {
+public class RegistroAnfitrionRequest extends RegistroUsuarioRequest {
 
-    @NotNull(message = "El ID de usuario es obligatorio")
-    @Schema(description = "ID del usuario base", example = "5")
-    private Integer usuarioId;
+    @Schema(example = "1995-08-15")
+    private LocalDate fechaRegistro; // opcional; si es null se toma hoy
 
     @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres")
     @Schema(description = "Descripción personal del anfitrión",

@@ -1,173 +1,143 @@
 package co.uniquindio.alojapp.Controller;
 
+import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
+import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
+import co.uniquindio.alojapp.negocio.DTO.request.CambiarPasswordRequest;
+import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
+import co.uniquindio.alojapp.negocio.Service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@Tag(name = "Usuarios", description = "Gestión del perfil, datos personales y métodos de pago del usuario")
-@SecurityRequirement(name = "bearerAuth") // requiere JWT
+@RequiredArgsConstructor
 public class UsuarioController {
 
-    // ===== DTOs simulados para ejemplos =====
-    static class UsuarioPerfilResponse {
-        @Schema(example = "123") public String id;
-        @Schema(example = "usuario@correo.com") public String email;
-        @Schema(example = "Juan Pérez") public String nombre;
-        @Schema(example = "HUESPED") public String rol;
-        @Schema(example = "ACTIVO") public String estado;
+    private final UsuarioService usuarioService;
+
+    // ========= 1) Registro  =========
+    @Operation(summary = "Registrar un nuevo usuario")
+    @ApiResponse(responseCode = "201", description = "Usuario creado")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
+    @PostMapping("/registro")
+    public ResponseEntity<UsuarioDTO> registrar(@Valid @RequestBody RegistroUsuarioRequest request) {
+        UsuarioDTO dto = usuarioService.registrar(request);
+        return ResponseEntity
+                .created(URI.create("/api/usuarios/" + dto.getId()))
+                .body(dto); // 201 Created
     }
 
-    static class ActualizarPerfilRequest {
-        @Schema(example = "Juan Pérez") public String nombre;
-        @Schema(example = "nueva_clave123") public String password;
-    }
-
-    static class MetodoPagoRequest {
-        @Schema(example = "VISA") public String tipo;
-        @Schema(example = "4111111111111111") public String numero;
-        @Schema(example = "12/27") public String fechaExpiracion;
-    }
-
-    static class MetodoPagoResponse {
-        @Schema(example = "88") public String id;
-        @Schema(example = "VISA") public String tipo;
-        @Schema(example = "****1111") public String numeroEnmascarado;
-        @Schema(example = "12/27") public String fechaExpiracion;
-    }
-
-    // =========================
-    // ENDPOINT 1: GET /api/usuarios/perfil
-    // =========================
+    // ========= 2) Obtener perfil propio =========
+    @Operation(summary = "Obtener perfil del usuario autenticado", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", description = "Perfil obtenido")
+    @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
     @GetMapping("/perfil")
-    @Operation(summary = "Obtener perfil del usuario autenticado",
-            description = "Retorna la información completa del usuario actualmente autenticado")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Perfil obtenido correctamente",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UsuarioPerfilResponse.class),
-                            examples = @ExampleObject(
-                                    value = "{ \"id\": \"123\", \"email\": \"usuario@correo.com\", \"nombre\": \"Juan Pérez\", \"rol\": \"HUESPED\", \"estado\": \"ACTIVO\" }"
-                            ))),
-            @ApiResponse(responseCode = "401", description = "No autenticado")
-    })
-    public ResponseEntity<UsuarioPerfilResponse> obtenerPerfil() {
-        UsuarioPerfilResponse perfil = new UsuarioPerfilResponse();
-        perfil.id = "123";
-        perfil.email = "usuario@correo.com";
-        perfil.nombre = "Juan Pérez";
-        perfil.rol = "HUESPED";
-        perfil.estado = "ACTIVO";
-        return ResponseEntity.ok(perfil);
+    public ResponseEntity<UsuarioDTO> obtenerPerfil() {
+        Integer userId = currentUserIdOrThrow();
+        UsuarioDTO dto = usuarioService.obtenerPorId(userId);
+        return ResponseEntity.ok(dto); // 200
     }
 
-    // =========================
-    // ENDPOINT 2: PUT /api/usuarios/perfil
-    // =========================
+    // ========= 3) Actualizar perfil propio =========
+    @Operation(summary = "Actualizar perfil del usuario autenticado", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", description = "Perfil actualizado")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
+    @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
     @PutMapping("/perfil")
-    @Operation(summary = "Actualizar perfil del usuario autenticado",
-            description = "Permite modificar los datos personales del usuario actual")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Perfil actualizado correctamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-            @ApiResponse(responseCode = "401", description = "No autenticado")
-    })
-    public ResponseEntity<String> actualizarPerfil(@RequestBody ActualizarPerfilRequest datos) {
-        return ResponseEntity.ok("Perfil actualizado correctamente");
+    public ResponseEntity<UsuarioDTO> actualizarPerfil(@Valid @RequestBody ActualizarPerfilRequest request) {
+        Integer userId = currentUserIdOrThrow();
+        UsuarioDTO dto = usuarioService.actualizarPerfil(userId, request);
+        return ResponseEntity.ok(dto); // 200
     }
 
-    // =========================
-    // ENDPOINT 3: GET /api/usuarios
-    // =========================
+    // ========= 4) Cambiar contraseña =========
+    @Operation(summary = "Cambiar contraseña del usuario autenticado", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "204", description = "Contraseña cambiada")
+    @ApiResponse(responseCode = "400", description = "Reglas inválidas o actual incorrecta", content = @Content)
+    @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+    @PutMapping("/perfil/password")
+    public ResponseEntity<Void> cambiarPassword(@Valid @RequestBody CambiarPasswordRequest body) {
+        Integer userId = currentUserIdOrThrow();
+        usuarioService.cambiarPassword(userId, body.getPasswordActual(), body.getNuevaPassword(), false);
+        return ResponseEntity.noContent().build(); // 204
+    }
+
+    // ========= 5) Listar usuarios (solo ADMIN) =========
+    @Operation(summary = "Listar todos los usuarios (solo ADMIN)")
+    @ApiResponse(responseCode = "200", description = "Listado devuelto")
+    @ApiResponse(responseCode = "403", description = "Prohibido (no ADMIN)", content = @Content)
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    @Operation(summary = "Listar todos los usuarios (solo ADMIN)",
-            description = "Devuelve un listado general de todos los usuarios registrados en el sistema")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida correctamente")
-    })
-    public ResponseEntity<List<UsuarioPerfilResponse>> listarUsuarios() {
-        List<UsuarioPerfilResponse> lista = new ArrayList<>();
-        UsuarioPerfilResponse u = new UsuarioPerfilResponse();
-        u.id = "123";
-        u.email = "usuario@correo.com";
-        u.nombre = "Juan Pérez";
-        u.rol = "HUESPED";
-        u.estado = "ACTIVO";
-        lista.add(u);
-        return ResponseEntity.ok(lista);
+    public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+        return ResponseEntity.ok(usuarioService.listar());
     }
 
-    // =========================
-    // ENDPOINT 4: POST /api/usuarios/metodos-pago
-    // =========================
-    @PostMapping("/metodos-pago")
-    @Operation(summary = "Agregar un método de pago",
-            description = "Permite al usuario añadir un nuevo método de pago para sus reservas")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Método de pago agregado correctamente",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MetodoPagoResponse.class),
-                            examples = @ExampleObject(
-                                    value = "{ \"id\": \"88\", \"tipo\": \"VISA\", \"numeroEnmascarado\": \"****1111\", \"fechaExpiracion\": \"12/27\" }"
-                            ))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-            @ApiResponse(responseCode = "401", description = "No autenticado")
-    })
-    public ResponseEntity<MetodoPagoResponse> agregarMetodoPago(@RequestBody MetodoPagoRequest datos) {
-        MetodoPagoResponse m = new MetodoPagoResponse();
-        m.id = "88";
-        m.tipo = datos.tipo;
-        m.numeroEnmascarado = "****1111";
-        m.fechaExpiracion = datos.fechaExpiracion;
-        return ResponseEntity.status(201).body(m);
+    // ========= 6) Desactivar (soft delete) propio =========
+    @Operation(summary = "Desactivar la cuenta del usuario autenticado (soft delete)", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "204", description = "Cuenta desactivada")
+    @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
+    @DeleteMapping("/perfil")
+    public ResponseEntity<Void> desactivarCuenta() {
+        Integer userId = currentUserIdOrThrow();
+        usuarioService.desactivar(userId);
+        return ResponseEntity.noContent().build(); // 204
     }
 
-    // =========================
-    // ENDPOINT 5: GET /api/usuarios/metodos-pago
-    // =========================
-    @GetMapping("/metodos-pago")
-    @Operation(summary = "Listar métodos de pago del usuario",
-            description = "Devuelve todos los métodos de pago registrados por el usuario autenticado")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Métodos de pago obtenidos correctamente")
-    })
-    public ResponseEntity<List<MetodoPagoResponse>> listarMetodosPago() {
-        List<MetodoPagoResponse> lista = new ArrayList<>();
-        MetodoPagoResponse m = new MetodoPagoResponse();
-        m.id = "88";
-        m.tipo = "VISA";
-        m.numeroEnmascarado = "****1111";
-        m.fechaExpiracion = "12/27";
-        lista.add(m);
-        return ResponseEntity.ok(lista);
+    // ================== Helper ==================
+    /**
+     * Obtiene el ID del usuario autenticado sin usar @AuthenticationPrincipal.
+     * Estrategia:
+     * 1) Si el Authentication.getName() es numérico -> se usa como ID.
+     * 2) Si no, se asume que es email/username -> se busca el ID por email.
+     */
+    private Integer currentUserIdOrThrow() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            throw new RuntimeException("No autenticado"); // Tu @ControllerAdvice lo mapea a 401
+        }
+
+        // 1) ¿UserDetails?
+        Object principal = auth.getPrincipal();
+        if (principal instanceof UserDetails ud) {
+            String username = ud.getUsername(); // normalmente email
+            return usuarioService.obtenerPorEmail(username)
+                    .map(UsuarioDTO::getId)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado para: " + username));
+        }
+
+        // 2) Fallback: usar auth.getName()
+        String name = auth.getName(); // en muchos casos es email; a veces puede ser el ID
+        // ¿es numérico? (id directo)
+        try {
+            return Integer.parseInt(name);
+        } catch (NumberFormatException ignored) { }
+
+        // Si no es numérico, tratar como email/username:
+        return usuarioService.obtenerPorEmail(name)
+                .map(UsuarioDTO::getId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado para: " + name));
     }
 
-    // =========================
-    // ENDPOINT 6: DELETE /api/usuarios/metodos-pago/{id}
-    // =========================
-    @DeleteMapping("/metodos-pago/{id}")
-    @Operation(summary = "Eliminar método de pago",
-            description = "Permite al usuario eliminar un método de pago registrado")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Método de pago eliminado correctamente"),
-            @ApiResponse(responseCode = "404", description = "Método de pago no encontrado")
-    })
-    public ResponseEntity<Void> eliminarMetodoPago(
-            @Parameter(description = "ID del método de pago a eliminar", example = "88")
-            @PathVariable String id
-    ) {
-        return ResponseEntity.noContent().build();
+    // DuplicateEmailException.java
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public class DuplicateEmailException extends RuntimeException {
+        public DuplicateEmailException(String message) { super(message); }
     }
+
 }

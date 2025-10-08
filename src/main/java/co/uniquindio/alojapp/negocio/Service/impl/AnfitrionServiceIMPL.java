@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -93,5 +95,13 @@ public class AnfitrionServiceIMPL implements AnfitrionService {
     @Transactional(readOnly = true)
     public boolean esAnfitrion(Integer usuarioId) {
         return usuarioDAO.esAnfitrion(usuarioId);
+    }
+
+    @Override
+    public void crearPerfil(Integer usuarioId,
+                            String descripcionPersonal,
+                            String documentosLegalesUrl,
+                            LocalDate fechaRegistro) {
+        usuarioDAO.crearAnfitrion(usuarioId, descripcionPersonal, documentosLegalesUrl, fechaRegistro);
     }
 }

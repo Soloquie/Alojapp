@@ -10,6 +10,7 @@ import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,20 +29,25 @@ public class AnfitrionDAO {
     /**
      * Crear nuevo anfitrión
      */
-    public AnfitrionDTO save(RegistroAnfitrionRequest request) {
-        Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public AnfitrionDTO save(Integer usuarioId,
+                             String descripcionPersonal,
+                             String documentosLegalesUrl,
+                             LocalDate fechaRegistro) {
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + usuarioId));
 
         Anfitrion anfitrion = Anfitrion.builder()
                 .usuario(usuario)
-                .descripcionPersonal(request.getDescripcionPersonal())
-                .documentosLegalesUrl(request.getDocumentosLegalesUrl())
-                .fechaRegistroAnfitrion(LocalDateTime.now())
+                .descripcionPersonal(descripcionPersonal)
+                .documentosLegalesUrl(documentosLegalesUrl)
+                .fechaRegistroAnfitrion(
+                        fechaRegistro != null ? fechaRegistro.atStartOfDay() : LocalDateTime.now()
+                )
                 .verificado(false)
                 .build();
 
-        Anfitrion saved = anfitrionRepository.save(anfitrion);
-        return anfitrionMapper.toDTO(saved);
+        return anfitrionMapper.toDTO(anfitrionRepository.save(anfitrion));
     }
 
     /**
