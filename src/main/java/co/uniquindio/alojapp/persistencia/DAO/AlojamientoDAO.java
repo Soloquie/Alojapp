@@ -188,7 +188,7 @@ public class AlojamientoDAO {
                         alojamiento.setCapacidadMaxima(request.getCapacidadMaxima());
                     }
                     if (request.getEstado() != null) {
-                        alojamiento.setEstado(EstadoAlojamiento.valueOf(request.getEstado()));
+                        alojamiento.setEstado(EstadoAlojamiento.valueOf(String.valueOf(request.getEstado())));
                     }
                     if (request.getServiciosIds() != null) {
                         List<ServicioAlojamiento> servicios = servicioRepository.findAllById(request.getServiciosIds());

@@ -1,11 +1,17 @@
 package co.uniquindio.alojapp.Controller;
 
+import co.uniquindio.alojapp.config.JwtProperties;
 import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
+import co.uniquindio.alojapp.negocio.DTO.request.LoginRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroAnfitrionRequest;
+import co.uniquindio.alojapp.negocio.DTO.response.LoginResponse;
 import co.uniquindio.alojapp.negocio.Service.UsuarioService;
 import co.uniquindio.alojapp.negocio.Service.AnfitrionService;
 // la que te propuse
+import co.uniquindio.alojapp.persistencia.Entity.Usuario;
+import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
+import co.uniquindio.alojapp.seguridad.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +22,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.BadCredentialsException;
+
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,19 +42,54 @@ public class AuthController {
 
     private final UsuarioService usuarioService;
     private final AnfitrionService anfitrionService;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final UsuarioRepository usuarioRepository;
+    private final JwtProperties jwtProps;
 
     // ====== LOGIN (placeholder: implementa tu JWT cuando lo tengas) ======
-    @PostMapping("/login")
     @Operation(summary = "Iniciar sesión (JWT)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
     })
-    public ResponseEntity<?> login() {
-        // Aquí iría tu authenticate + generación de JWT (cuando integres JWT)
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body("TODO: implementar login con JWT");
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
+        try {
+            // autentica contra tu UserDetailsService + PasswordEncoder
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
+        }
+
+        // Si pasó, credenciales OK
+        UserDetails user = userDetailsService.loadUserByUsername(req.getEmail());
+        String token = jwtService.generateToken(user, Map.of());
+
+        Usuario u = usuarioRepository.findByEmail(req.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        // Derivar un rol legible para el front (ajústalo a tu modelo real)
+        String rol = (u.getPerfilAdministrador() != null) ? "ADMIN"
+                : (u.getPerfilAnfitrion() != null)   ? "ANFITRION"
+                : "HUESPED";
+
+        LoginResponse resp = LoginResponse.builder()
+                .token(token)
+                .tokenType("Bearer")
+                .usuarioId(u.getId())
+                .nombre(u.getNombre())
+                .email(u.getEmail())
+                .rol(rol)
+                .expiresIn(jwtProps.getExpirationMs()) // si no usas JwtProperties, elimina esta línea
+                .build();
+
+        return ResponseEntity.ok(resp);
     }
+
 
     // ====== REGISTRO HUESPED ======
     @PostMapping("/registro-huesped")
