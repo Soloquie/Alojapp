@@ -1,0 +1,1580 @@
+{
+  "info": {
+    "name": "AlojApp API - Pruebas Funcionales",
+    "description": "Colección de pruebas funcionales para la API de AlojApp",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "token_admin",
+      "value": "tu_token_admin_aqui",
+      "type": "string"
+    },
+    {
+      "key": "token_anfitrion",
+      "value": "tu_token_anfitrion_aqui",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reserva_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "alojamiento_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "comentario_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "LOGIN",
+      "item": [
+        {
+          "name": "P1.1_Iniciar_sesion_exitosamente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana.gomez@ejemplo.com\",\n  \"password\": \"ClaveSegura1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Iniciar sesión exitosamente - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.token).to.exist.and.to.be.a('string');",
+                  "    pm.expect(jsonData.mensaje).to.eql('Usuario autenticado correctamente');",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "    pm.environment.set('user_id', jsonData.usuarioId);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P1.2_Error_al_iniciar_sesion_con_credenciales_incorrectas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana.gomez@ejemplo.com\",\n  \"password\": \"claveIncorrecta\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Error al iniciar sesión con credenciales incorrectas - Response 401"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has error message\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Credenciales inválidas');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P1.3_Error_al_iniciar_sesion_sin_password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana.gomez@ejemplo.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Error al iniciar sesión sin contraseña - Response 400"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('El campo \\\\'password\\\\' es obligatorio');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "USUARIO_PERFIL",
+      "item": [
+        {
+          "name": "P2.1_Obtener_perfil_del_usuario_autenticado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/perfil",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "perfil"]
+            },
+            "description": "Obtener perfil del usuario autenticado - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has user data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('number');",
+                  "    pm.expect(jsonData.email).to.eql('ana.gomez@ejemplo.com');",
+                  "    pm.expect(jsonData.nombre).to.be.a('string');",
+                  "    pm.expect(jsonData.rol).to.eql('HUESPED');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P2.2_Error_al_obtener_perfil_sin_autenticacion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/perfil",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "perfil"]
+            },
+            "description": "Error al obtener perfil sin autenticación - Response 401"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has auth error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('No autenticado');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P2.3_Actualizar_perfil_del_usuario_autenticado",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana Actualizada\",\n  \"password\": \"NuevaClaveSegura2\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/perfil",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "perfil"]
+            },
+            "description": "Actualizar perfil del usuario autenticado - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response confirms update\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.eql('Perfil actualizado correctamente');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P2.4_Error_al_actualizar_perfil_con_datos_invalidos",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana Pérez\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/perfil",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios", "perfil"]
+            },
+            "description": "Error al actualizar perfil con datos inválidos - Response 400"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.include('La contraseña debe tener mínimo 8 caracteres');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P2.5_Listar_todos_los_usuarios_solo_rol_ADMIN",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios"]
+            },
+            "description": "Listar todos los usuarios (solo rol ADMIN) - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of users\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(1);",
+                  "    pm.expect(jsonData[0].id).to.be.a('number');",
+                  "    pm.expect(jsonData[0].email).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P2.6_Error_al_listar_todos_los_usuarios_sin_permisos_de_administrador",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "usuarios"]
+            },
+            "description": "Error al listar todos los usuarios sin permisos de administrador - Response 403"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has forbidden error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Acceso denegado');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ADMIN",
+      "item": [
+        {
+          "name": "P3.1_Listar_todos_los_usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "usuarios"]
+            },
+            "description": "Listar todos los usuarios - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of users\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData[0].id).to.eql('55');",
+                  "    pm.expect(jsonData[0].email).to.eql('juan@correo.com');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P3.2_Cambiar_estado_de_un_usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/usuarios/55/estado?nuevoEstado=BLOQUEADO",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "usuarios", "55", "estado"],
+              "query": [
+                {
+                  "key": "nuevoEstado",
+                  "value": "BLOQUEADO"
+                }
+              ]
+            },
+            "description": "Cambiar estado de un usuario - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response confirms update\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.include('Usuario 55 cambiado a estado BLOQUEADO');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P3.3_Error_al_cambiar_estado_de_usuario_inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/usuarios/9999/estado?nuevoEstado=BLOQUEADO",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "usuarios", "9999", "estado"],
+              "query": [
+                {
+                  "key": "nuevoEstado",
+                  "value": "BLOQUEADO"
+                }
+              ]
+            },
+            "description": "Error al cambiar estado de usuario inexistente - Response 404"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has not found error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Usuario no encontrado');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P3.4_Listar_todos_los_alojamientos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/alojamientos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "alojamientos"]
+            },
+            "description": "Listar todos los alojamientos - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of alojamientos\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData[0].id).to.eql('15');",
+                  "    pm.expect(jsonData[0].nombre).to.eql('Casa en la playa');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P3.5_Cambiar_estado_de_un_alojamiento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/alojamientos/15/estado?nuevoEstado=BLOQUEADO",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "alojamientos", "15", "estado"],
+              "query": [
+                {
+                  "key": "nuevoEstado",
+                  "value": "BLOQUEADO"
+                }
+              ]
+            },
+            "description": "Cambiar estado de un alojamiento - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response confirms update\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.include('Alojamiento 15 cambiado a estado BLOQUEADO');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P3.6_Eliminar_comentario_ofensivo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/comentarios/100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "comentarios", "100"]
+            },
+            "description": "Eliminar comentario ofensivo - Response 204"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is empty\", function () {",
+                  "    pm.expect(pm.response.text()).to.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RESERVAS",
+      "item": [
+        {
+          "name": "P4.1_Crear_nueva_reserva_correctamente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas?alojamientoId=15&fechaInicio=2025-09-20&fechaFin=2025-09-25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas"],
+              "query": [
+                {
+                  "key": "alojamientoId",
+                  "value": "15"
+                },
+                {
+                  "key": "fechaInicio",
+                  "value": "2025-09-20"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2025-09-25"
+                }
+              ]
+            },
+            "description": "Crear nueva reserva correctamente - Response 201"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has reserva data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.alojamientoId).to.eql('15');",
+                  "    pm.expect(jsonData.usuarioEmail).to.eql('ana.gomez@ejemplo.com');",
+                  "    pm.expect(jsonData.estado).to.eql('Pendiente');",
+                  "    pm.environment.set('reserva_id', jsonData.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P4.2_Error_al_crear_reserva_con_fechas_invalidas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas?alojamientoId=15&fechaInicio=2025-09-30&fechaFin=2025-09-25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas"],
+              "query": [
+                {
+                  "key": "alojamientoId",
+                  "value": "15"
+                },
+                {
+                  "key": "fechaInicio",
+                  "value": "2025-09-30"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2025-09-25"
+                }
+              ]
+            },
+            "description": "Error al crear reserva con fechas inválidas - Response 400"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has error message\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('La fecha de inicio no puede ser posterior a la fecha de fin');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P4.3_Listar_reservas_del_usuario_autenticado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas"]
+            },
+            "description": "Listar reservas del usuario autenticado - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of reservas\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(1);",
+                  "    pm.expect(jsonData[0].id).to.be.a('string');",
+                  "    pm.expect(jsonData[0].estado).to.eql('Confirmada');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P4.4_Obtener_detalle_de_una_reserva_existente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas/25",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas", "25"]
+            },
+            "description": "Obtener detalle de una reserva existente - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has reserva data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql('25');",
+                  "    pm.expect(jsonData.alojamientoId).to.eql('15');",
+                  "    pm.expect(jsonData.estado).to.eql('Pendiente');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P4.5_Error_al_consultar_reserva_inexistente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas/9999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas", "9999"]
+            },
+            "description": "Error al consultar reserva inexistente - Response 404"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has not found error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Reserva no encontrada');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P4.6_Cancelar_una_reserva_existente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas/25/cancelar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas", "25", "cancelar"]
+            },
+            "description": "Cancelar una reserva existente - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response confirms cancellation\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.include('Reserva cancelada con ID: 25');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P4.7_Listar_reservas_recibidas_por_el_anfitrion",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas/anfitrion",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas", "anfitrion"]
+            },
+            "description": "Listar reservas recibidas por el anfitrión - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of reservas\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(1);",
+                  "    pm.expect(jsonData[0].id).to.eql('40');",
+                  "    pm.expect(jsonData[0].estado).to.eql('Confirmada');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P4.8_Filtrar_reservas_de_anfitrion_por_estado_y_rango_de_fechas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas/anfitrion/filtrar?estado=Pendiente&fechaDesde=2025-09-20&fechaHasta=2025-09-30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas", "anfitrion", "filtrar"],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "Pendiente"
+                },
+                {
+                  "key": "fechaDesde",
+                  "value": "2025-09-20"
+                },
+                {
+                  "key": "fechaHasta",
+                  "value": "2025-09-30"
+                }
+              ]
+            },
+            "description": "Filtrar reservas de anfitrión por estado y rango de fechas - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is filtered array\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData[0].id).to.eql('41');",
+                  "    pm.expect(jsonData[0].estado).to.eql('Pendiente');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ALOJAMIENTOS",
+      "item": [
+        {
+          "name": "P5.1_Crear_nuevo_alojamiento_correctamente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Casa de playa en Cartagena\",\n  \"descripcion\": \"Hermosa casa frente al mar con piscina\",\n  \"ubicacion\": \"Cartagena\",\n  \"precioPorNoche\": 350000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos"]
+            },
+            "description": "Crear nuevo alojamiento correctamente - Response 201"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has alojamiento data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql('10');",
+                  "    pm.expect(jsonData.titulo).to.eql('Casa de playa en Cartagena');",
+                  "    pm.expect(jsonData.estado).to.eql('Disponible');",
+                  "    pm.environment.set('alojamiento_id', jsonData.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.2_Error_al_crear_alojamiento_con_datos_invalidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"\",\n  \"descripcion\": \"Casa sin precio\",\n  \"ubicacion\": \"Cartagena\",\n  \"precioPorNoche\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos"]
+            },
+            "description": "Error al crear alojamiento con datos inválidos - Response 400"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Los datos del alojamiento son inválidos');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.3_Listar_todos_los_alojamientos_publicados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos"]
+            },
+            "description": "Listar todos los alojamientos publicados - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of alojamientos\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(1);",
+                  "    pm.expect(jsonData[0].id).to.eql('10');",
+                  "    pm.expect(jsonData[0].titulo).to.eql('Casa de playa en Cartagena');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.4_Obtener_detalle_de_un_alojamiento_existente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos", "10"]
+            },
+            "description": "Obtener detalle de un alojamiento existente - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has alojamiento data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql('10');",
+                  "    pm.expect(jsonData.titulo).to.eql('Casa de playa en Cartagena');",
+                  "    pm.expect(jsonData.precioPorNoche).to.eql(350000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.5_Error_al_consultar_alojamiento_inexistente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos/9999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos", "9999"]
+            },
+            "description": "Error al consultar alojamiento inexistente - Response 404"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has not found error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Alojamiento no encontrado');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.6_Actualizar_un_alojamiento_existente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Casa renovada en Cartagena\",\n  \"descripcion\": \"Casa con nuevas mejoras y piscina\",\n  \"ubicacion\": \"Cartagena\",\n  \"precioPorNoche\": 400000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos", "10"]
+            },
+            "description": "Actualizar un alojamiento existente - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response confirms update\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.eql('Alojamiento 10 actualizado correctamente');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.7_Error_al_actualizar_un_alojamiento_inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Alojamiento actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos/9999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos", "9999"]
+            },
+            "description": "Error al actualizar un alojamiento inexistente - Response 404"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has not found error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Alojamiento no encontrado');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.8_Eliminar_un_alojamiento_existente",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos", "10"]
+            },
+            "description": "Eliminar un alojamiento existente - Response 204"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is empty\", function () {",
+                  "    pm.expect(pm.response.text()).to.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P5.9_Error_al_eliminar_un_alojamiento_inexistente",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_anfitrion}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alojamientos/9999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alojamientos", "9999"]
+            },
+            "description": "Error al eliminar un alojamiento inexistente - Response 404"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has not found error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Alojamiento no encontrado');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "COMENTARIOS",
+      "item": [
+        {
+          "name": "P6.1_Crear_un_comentario_valido_en_un_alojamiento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Excelente alojamiento, muy limpio y cómodo\",\n  \"calificacion\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comentarios/15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comentarios", "15"]
+            },
+            "description": "Crear un comentario válido en un alojamiento - Response 201"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has comentario data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql('100');",
+                  "    pm.expect(jsonData.contenido).to.eql('Excelente alojamiento, muy limpio y cómodo');",
+                  "    pm.expect(jsonData.calificacion).to.eql(5);",
+                  "    pm.environment.set('comentario_id', jsonData.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P6.2_Error_al_crear_comentario_con_datos_invalidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"\",\n  \"calificacion\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comentarios/15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comentarios", "15"]
+            },
+            "description": "Error al crear comentario con datos inválidos - Response 400"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has validation error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Los datos del comentario son inválidos');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P6.3_Listar_comentarios_de_un_alojamiento",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/comentarios/15",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comentarios", "15"]
+            },
+            "description": "Listar comentarios de un alojamiento - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array of comentarios\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(1);",
+                  "    pm.expect(jsonData[0].id).to.eql('100');",
+                  "    pm.expect(jsonData[0].calificacion).to.eql(5);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P6.4_Listar_comentarios_de_un_alojamiento_sin_comentarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/comentarios/99",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comentarios", "99"]
+            },
+            "description": "Listar comentarios de un alojamiento sin comentarios - Response 200"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is empty array\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array').that.is.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P6.5_Eliminar_un_comentario_existente",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/comentarios/100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comentarios", "100"]
+            },
+            "description": "Eliminar un comentario existente - Response 204"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is empty\", function () {",
+                  "    pm.expect(pm.response.text()).to.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P6.6_Error_al_eliminar_un_comentario_inexistente",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/comentarios/999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comentarios", "999"]
+            },
+            "description": "Error al eliminar un comentario inexistente - Response 404"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has not found error\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql('Comentario no encontrado');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
