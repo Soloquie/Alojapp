@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Schema(description = "Request para actualizar perfil de usuario")
 public class ActualizarPerfilRequest {
 
-    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
+    @Size(min = 2, max = 80, message = "El nombre debe tener entre 2 y 80 caracteres")
     @Schema(description = "Nombre completo", example = "Juan Carlos Pérez")
     private String nombre;
 
