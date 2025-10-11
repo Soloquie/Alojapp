@@ -62,4 +62,6 @@ public interface UsuarioService {
 
     UsuarioDTO registrarComoAnfitrion(Integer usuarioId, RegistrarPerfilAnfitrionRequest req);
     void quitarAnfitrion(Integer usuarioId);
+    String actualizarFotoPerfil(Integer usuarioId, String nuevaUrlSegura); // guarda URL en BD
+
 }

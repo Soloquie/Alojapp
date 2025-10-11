@@ -5,14 +5,17 @@ import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistrarPerfilAnfitrionRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
 import co.uniquindio.alojapp.negocio.Service.UsuarioService;
+import co.uniquindio.alojapp.negocio.excepciones.RecursoNoEncontradoException;
 import co.uniquindio.alojapp.persistencia.DAO.UsuarioDAO;
 import co.uniquindio.alojapp.persistencia.Entity.Usuario;
 import co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoUsuario;
+import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -28,6 +31,7 @@ public class UsuarioServiceIMPL implements UsuarioService {
 
     private final UsuarioDAO usuarioDAO;
     private final PasswordEncoder passwordEncoder; // BCrypt
+    private final UsuarioRepository usuarioRepository;
 
 
     // ====== Reglas de validación alineadas a tu modelo/requests ======
@@ -282,6 +286,29 @@ public class UsuarioServiceIMPL implements UsuarioService {
     public void quitarAnfitrion(Integer usuarioId) {
         boolean ok = usuarioDAO.eliminarAnfitrion(usuarioId); // TODO: implementar en DAO
         if (!ok) throw new RuntimeException("No se pudo quitar rol anfitrión al usuario " + usuarioId);
+    }
+
+    @Override
+    @Transactional
+    public String actualizarFotoPerfil(Integer usuarioId, String nuevaUrlSegura) {
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("usuarioId es obligatorio");
+        }
+        if (!StringUtils.hasText(nuevaUrlSegura)) {
+            throw new IllegalArgumentException("La URL de la foto es obligatoria");
+        }
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+
+        // (Opcional) si quieres loguear la anterior:
+        String anterior = usuario.getFotoPerfilUrl();
+        usuario.setFotoPerfilUrl(nuevaUrlSegura);
+
+        usuarioRepository.save(usuario);
+
+        log.info("Foto de perfil actualizada. userId={}, anterior={}, nueva={}", usuarioId, anterior, nuevaUrlSegura);
+        return nuevaUrlSegura;
     }
 
 }
