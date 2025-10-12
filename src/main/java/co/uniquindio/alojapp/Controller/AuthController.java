@@ -30,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.Map;
@@ -62,7 +63,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
             );
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Contraseña Incorrectos"); // 401
         }
 
         // Si pasó, credenciales OK
