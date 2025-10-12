@@ -6,6 +6,10 @@ import co.uniquindio.alojapp.negocio.DTO.request.BuscarAlojamientosRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.CrearAlojamientoRequest;
 import co.uniquindio.alojapp.negocio.DTO.response.PaginacionResponse;
 import co.uniquindio.alojapp.negocio.Service.AlojamientoService;
+import co.uniquindio.alojapp.negocio.excepciones.RecursoNoEncontradoException;
+import co.uniquindio.alojapp.persistencia.Entity.Usuario;
+import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
+import co.uniquindio.alojapp.seguridad.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +24,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,6 +41,7 @@ import java.util.Optional;
 public class AlojamientoController {
 
     private final AlojamientoService alojamientoService;
+    private final UsuarioRepository usuarioRepository;
 
     // =========================================================================
     // Rutas para ANFITRIÓN (crear / actualizar / eliminar / listar propios)
@@ -56,37 +63,31 @@ public class AlojamientoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-    @PutMapping("/anfitriones/{anfitrionId}/alojamientos/{alojamientoId}")
+    @PutMapping("/anfitrion/mis-alojamientos/{alojamientoId}")
     @Operation(summary = "Actualizar alojamiento (anfitrión) - solo dueño")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Alojamiento actualizado correctamente"),
             @ApiResponse(responseCode = "404", description = "Alojamiento no encontrado o no pertenece al anfitrión", content = @Content)
     })
-    public ResponseEntity<AlojamientoDTO> actualizarAlojamiento(
-            @Parameter(description = "ID del anfitrión", example = "2")
-            @PathVariable Integer anfitrionId,
-            @Parameter(description = "ID del alojamiento", example = "10")
+    public ResponseEntity<AlojamientoDTO> actualizarMiAlojamiento(
             @PathVariable Integer alojamientoId,
             @Valid @RequestBody ActualizarAlojamientoRequest request
     ) {
-        AlojamientoDTO dto = alojamientoService.actualizar(alojamientoId, anfitrionId, request);
+        Integer usuarioId = currentUserId();
+        AlojamientoDTO dto = alojamientoService.actualizarDeUsuario(usuarioId, alojamientoId, request);
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/anfitriones/{anfitrionId}/alojamientos/{alojamientoId}")
+    @DeleteMapping("/anfitrion/mis-alojamientos/{alojamientoId}")
     @Operation(summary = "Eliminar (soft) alojamiento (anfitrión) - valida reservas futuras")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Alojamiento eliminado"),
             @ApiResponse(responseCode = "404", description = "Alojamiento no encontrado o no pertenece al anfitrión", content = @Content),
             @ApiResponse(responseCode = "409", description = "Tiene reservas futuras", content = @Content)
     })
-    public ResponseEntity<Void> eliminarAlojamiento(
-            @Parameter(description = "ID del anfitrión", example = "2")
-            @PathVariable Integer anfitrionId,
-            @Parameter(description = "ID del alojamiento", example = "10")
-            @PathVariable Integer alojamientoId
-    ) {
-        boolean ok = alojamientoService.eliminar(alojamientoId, anfitrionId);
+    public ResponseEntity<Void> eliminarMiAlojamiento(@PathVariable Integer alojamientoId) {
+        Integer userId = currentUserId();
+        boolean ok = alojamientoService.eliminarDeUsuario(userId, alojamientoId);
         return ok ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
@@ -100,9 +101,9 @@ public class AlojamientoController {
     ) {
         return ResponseEntity.ok(alojamientoService.listarPorAnfitrion(anfitrionId, pagina, tamano));
     }
-
     // =========================================================================
     // Rutas PÚBLICAS (ver detalle, listar activos, buscar con filtros)
+
     // =========================================================================
 
     @GetMapping("/alojamientos/{id}")
@@ -187,4 +188,16 @@ public class AlojamientoController {
     ) {
         return ResponseEntity.ok(alojamientoService.estaDisponible(id, checkin, checkout));
     }
+
+    private Integer currentUserId() {
+        String email = SecurityUtils.getEmailActual().orElse(null);
+        if (!StringUtils.hasText(email)) {
+            // El EntryPoint/JwtAccessDenied se encargan del 401; aquí dejamos una señal clara
+            throw new RecursoNoEncontradoException("Usuario autenticado no encontrado");
+        }
+        return usuarioRepository.findByEmailIgnoreCase(email)
+                .map(Usuario::getId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado por email"));
+    }
+
 }

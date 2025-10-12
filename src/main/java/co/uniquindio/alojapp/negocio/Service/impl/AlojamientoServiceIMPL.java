@@ -7,8 +7,10 @@ import co.uniquindio.alojapp.negocio.DTO.request.CrearAlojamientoRequest;
 import co.uniquindio.alojapp.negocio.DTO.response.PaginacionResponse;
 import co.uniquindio.alojapp.negocio.Service.AlojamientoService;
 import co.uniquindio.alojapp.persistencia.DAO.AlojamientoDAO;
+import co.uniquindio.alojapp.persistencia.Entity.Alojamiento;
 import co.uniquindio.alojapp.persistencia.Entity.Anfitrion;
 import co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoAlojamiento;
+import co.uniquindio.alojapp.persistencia.Repository.AlojamientoRepository;
 import co.uniquindio.alojapp.persistencia.Repository.AnfitrionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,8 @@ public class AlojamientoServiceIMPL implements AlojamientoService {
 
     private final AlojamientoDAO alojamientoDAO;
     private final AnfitrionRepository anfitrionRepository;
+    private final AlojamientoRepository alojamientoRepository;
+
 
     private Integer anfitrionIdDeUsuario(Integer usuarioId) {
         Anfitrion a = anfitrionRepository.findByUsuarioId(usuarioId)
@@ -99,6 +103,19 @@ public class AlojamientoServiceIMPL implements AlojamientoService {
     @Override
     public PaginacionResponse<AlojamientoDTO> listarActivos(int pagina, int tamano) {
         return alojamientoDAO.findActivos(pagina, tamano);
+    }
+
+    @Override
+    @Transactional
+    public AlojamientoDTO actualizarDeUsuario(Integer usuarioId, Integer alojamientoId, ActualizarAlojamientoRequest req) {
+        return alojamientoDAO.actualizarDeUsuario(usuarioId, alojamientoId, req)
+                .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado o no te pertenece"));
+    }
+
+    @Override
+    @Transactional
+    public boolean eliminarDeUsuario(Integer usuarioId, Integer alojamientoId) {
+        return alojamientoDAO.eliminarDeUsuario(usuarioId, alojamientoId);
     }
 
     @Override

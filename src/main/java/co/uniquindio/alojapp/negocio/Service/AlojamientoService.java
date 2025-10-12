@@ -38,4 +38,8 @@ public interface AlojamientoService {
     Boolean estaDisponible(Integer id, LocalDate checkin, LocalDate checkout);
 
     PaginacionResponse<AlojamientoDTO> listarActivos(int pagina, int tamano);
+
+    AlojamientoDTO actualizarDeUsuario(Integer usuarioId, Integer alojamientoId, ActualizarAlojamientoRequest request);
+
+    boolean eliminarDeUsuario(Integer userId, Integer alojamientoId);
 }

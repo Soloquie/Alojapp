@@ -284,4 +284,33 @@ public class AlojamientoDAO {
                 .tieneAnterior(page.hasPrevious())
                 .build();
     }
+
+    /**
+     * Actualizar un alojamiento perteneciente al usuario (valida propiedad)
+     */
+    public Optional<AlojamientoDTO> actualizarDeUsuario(Integer usuarioId,
+                                                        Integer alojamientoId,
+                                                        ActualizarAlojamientoRequest request) {
+        Integer anfitrionId = anfitrionIdPorUsuario(usuarioId);
+        return actualizar(alojamientoId, request, anfitrionId); // reutiliza tu método existente
+    }
+
+    /**
+     * Obtiene el ID de anfitrión a partir del usuario autenticado
+     */
+    private Integer anfitrionIdPorUsuario(Integer usuarioId) {
+        return anfitrionRepository.findByUsuarioId(usuarioId)
+                .map(Anfitrion::getId)
+                .orElseThrow(() -> new RuntimeException("El usuario no es anfitrión"));
+    }
+
+    /**
+     * Elimina un alojamiento perteneciente al usuario (valida propiedad)
+     */
+    public boolean eliminarDeUsuario(Integer usuarioId, Integer alojamientoId) {
+        Integer anfitrionId = anfitrionRepository.findByUsuarioId(usuarioId)
+                .map(Anfitrion::getId)
+                .orElseThrow(() -> new RuntimeException("El usuario no es anfitrión"));
+        return eliminar(alojamientoId, anfitrionId);
+    }
 }
