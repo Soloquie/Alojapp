@@ -2,10 +2,10 @@ package co.uniquindio.alojapp.negocio.Service.impl;
 
 import co.uniquindio.alojapp.negocio.DTO.AlojamientoDTO;
 import co.uniquindio.alojapp.negocio.DTO.request.ActualizarAlojamientoRequest;
+import co.uniquindio.alojapp.negocio.DTO.request.ActualizarAlojamientoRequestTest;
 import co.uniquindio.alojapp.negocio.DTO.request.BuscarAlojamientosRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.CrearAlojamientoRequest;
 import co.uniquindio.alojapp.negocio.DTO.response.PaginacionResponse;
-import co.uniquindio.alojapp.negocio.Service.impl.AlojamientoServiceIMPL;
 import co.uniquindio.alojapp.persistencia.DAO.AlojamientoDAO;
 import co.uniquindio.alojapp.persistencia.Entity.Anfitrion;
 import co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoAlojamiento;

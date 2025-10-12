@@ -38,5 +38,13 @@ public interface ServicioAlojamientoService {
             this.servicio = servicio;
             this.totalAlojamientos = totalAlojamientos != null ? totalAlojamientos : 0L;
         }
+
+        public ServicioAlojamientoDTO getServicio() {
+            return servicio;
+        }
+
+        public Long getTotalAlojamientos() {
+            return totalAlojamientos;
+        }
     }
 }

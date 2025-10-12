@@ -5,9 +5,11 @@ import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistrarPerfilAnfitrionRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
 import co.uniquindio.alojapp.negocio.Service.impl.UsuarioServiceIMPL;
+import co.uniquindio.alojapp.negocio.excepciones.RecursoNoEncontradoException;
 import co.uniquindio.alojapp.persistencia.DAO.UsuarioDAO;
 import co.uniquindio.alojapp.persistencia.Entity.Usuario;
 import co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoUsuario;
+import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,9 @@ public class UsuarioServiceTest {
 
     @Mock
     private UsuarioDAO usuarioDAO;
+
+    @Mock
+    private UsuarioRepository usuarioRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -345,13 +350,29 @@ public class UsuarioServiceTest {
         // ARRANGE
         usuarioMock.setEstado(EstadoUsuario.INACTIVO);
         when(usuarioDAO.findEntityById(USUARIO_ID_VALIDO)).thenReturn(Optional.of(usuarioMock));
-        when(usuarioDAO.activar(USUARIO_ID_VALIDO)).thenReturn(true);
+        when(usuarioDAO.activar(USUARIO_ID_VALIDO)).thenReturn(true); // ← Asegurar que devuelve true
 
         // ACT
         usuarioService.activar(USUARIO_ID_VALIDO);
 
         // ASSERT
         verify(usuarioDAO, times(1)).findEntityById(USUARIO_ID_VALIDO);
+        verify(usuarioDAO, times(1)).activar(USUARIO_ID_VALIDO);
+    }
+
+    @Test
+    @DisplayName("ACTIVAR - Fallo en activación lanza RuntimeException")
+    void activar_FalloEnActivacion_LanzaRuntimeException() {
+        // ARRANGE
+        usuarioMock.setEstado(EstadoUsuario.INACTIVO);
+        when(usuarioDAO.findEntityById(USUARIO_ID_VALIDO)).thenReturn(Optional.of(usuarioMock));
+        when(usuarioDAO.activar(USUARIO_ID_VALIDO)).thenReturn(false); // ← Simular fallo
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> usuarioService.activar(USUARIO_ID_VALIDO))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Implementa usuarioDAO.activar(id)");
+
         verify(usuarioDAO, times(1)).activar(USUARIO_ID_VALIDO);
     }
 
@@ -540,5 +561,60 @@ public class UsuarioServiceTest {
         assertThatThrownBy(() -> usuarioService.registrar(registroRequestValido))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("El usuario debe ser mayor de 18 años");
+    }
+
+    @Test
+    @DisplayName("ACTUALIZAR FOTO PERFIL - Datos válidos actualiza foto")
+    void actualizarFotoPerfil_DatosValidos_ActualizaFoto() {
+        // ARRANGE
+        String nuevaUrl = "https://example.com/foto.jpg";
+        when(usuarioRepository.findById(USUARIO_ID_VALIDO)).thenReturn(Optional.of(usuarioMock));
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioMock);
+
+        // ACT
+        String resultado = usuarioService.actualizarFotoPerfil(USUARIO_ID_VALIDO, nuevaUrl);
+
+        // ASSERT
+        assertThat(resultado).isEqualTo(nuevaUrl);
+        verify(usuarioRepository, times(1)).findById(USUARIO_ID_VALIDO);
+        verify(usuarioRepository, times(1)).save(usuarioMock);
+    }
+
+    @Test
+    @DisplayName("ACTUALIZAR FOTO PERFIL - Usuario no existe lanza excepción")
+    void actualizarFotoPerfil_UsuarioNoExiste_LanzaExcepcion() {
+        // ARRANGE
+        String nuevaUrl = "https://example.com/foto.jpg";
+        when(usuarioRepository.findById(USUARIO_ID_INEXISTENTE)).thenReturn(Optional.empty());
+
+        // ACT & ASSERT
+        assertThatThrownBy(() ->
+                usuarioService.actualizarFotoPerfil(USUARIO_ID_INEXISTENTE, nuevaUrl))
+                .isInstanceOf(RecursoNoEncontradoException.class)
+                .hasMessageContaining("Usuario no encontrado");
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("ACTUALIZAR FOTO PERFIL - URL vacía lanza IllegalArgumentException")
+    void actualizarFotoPerfil_UrlVacia_LanzaExcepcion() {
+        // ACT & ASSERT
+        assertThatThrownBy(() ->
+                usuarioService.actualizarFotoPerfil(USUARIO_ID_VALIDO, ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("La URL de la foto es obligatoria");
+    }
+
+    @Test
+    @DisplayName("REGISTRAR - Email con formato inválido lanza excepción")
+    void registrar_EmailFormatoInvalido_LanzaExcepcion() {
+        // ARRANGE
+        registroRequestValido.setEmail("email-invalido");
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> usuarioService.registrar(registroRequestValido))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("El email no tiene un formato válido");
     }
 }
