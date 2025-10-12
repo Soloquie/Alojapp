@@ -101,7 +101,7 @@ public class UsuarioController {
     })
     public ResponseEntity<Void> cambiarPassword(@Valid @RequestBody CambiarPasswordRequest req) {
         Integer userId = currentUserId();
-        usuarioService.cambiarPassword(userId, req.getPasswordActual(), req.getNuevaPassword(), true);
+        usuarioService.cambiarPassword(userId, req.getPasswordActual(), req.getNuevaPassword(), false);
         return ResponseEntity.noContent().build();
     }
 
