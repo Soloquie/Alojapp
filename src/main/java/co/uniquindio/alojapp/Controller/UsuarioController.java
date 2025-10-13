@@ -117,8 +117,10 @@ public class UsuarioController {
         if (!current.equals(id)) {
             throw new AccesoNoAutorizadoException("No puedes acceder al perfil de otro usuario");
         }
-        return ResponseEntity.ok(usuarioService.obtenerPorId(id));
+        // OJO: solo devolver usuarios ACTIVOS
+        return ResponseEntity.ok(usuarioService.obtenerPorIdActivo(id));
     }
+
 
     @PostMapping(value = "/me/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> actualizarFotoPerfil(@RequestParam("file") MultipartFile file) throws IOException {
@@ -142,5 +144,16 @@ public class UsuarioController {
         return ResponseEntity.badRequest().body(body);
     }
 
-
+    @DeleteMapping("/me")
+    @Operation(summary = "Eliminar mi cuenta (soft delete)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Cuenta eliminada"),
+            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content),
+            @ApiResponse(responseCode = "409", description = "No se puede eliminar por reglas de negocio", content = @Content)
+    })
+    public ResponseEntity<Void> eliminarMiCuenta() {
+        Integer userId = currentUserId();
+        usuarioService.eliminarCuenta(userId);   // << nuevo método de servicio
+        return ResponseEntity.noContent().build();
+    }
 }

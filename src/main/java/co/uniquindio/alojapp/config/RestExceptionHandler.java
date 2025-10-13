@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 
 @RestControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
 public class RestExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)

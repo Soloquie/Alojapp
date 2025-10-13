@@ -3,11 +3,13 @@
     import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
     import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
     import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
+    import co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoReserva;
     import co.uniquindio.alojapp.persistencia.Entity.Usuario;
     import co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoUsuario;
     import co.uniquindio.alojapp.persistencia.Mapper.UsuarioMapper;
     import co.uniquindio.alojapp.persistencia.Repository.AdministradorRepository;
     import co.uniquindio.alojapp.persistencia.Repository.AnfitrionRepository;
+    import co.uniquindio.alojapp.persistencia.Repository.ReservaRepository;
     import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
     import lombok.RequiredArgsConstructor;
     import org.springframework.stereotype.Repository;
@@ -35,6 +37,7 @@
 
         private final AdministradorRepository administradorRepository;
         private final AnfitrionRepository anfitrionRepository;
+        private final ReservaRepository reservaRepository;
 
         /**
          * Crear nuevo usuario
@@ -304,4 +307,24 @@
                }
 
 
+        public boolean tieneReservasFuturasComoHuesped(Integer usuarioId) {
+            return reservaRepository.existsByHuesped_IdAndFechaCheckinGreaterThanEqualAndEstadoIn(
+                    usuarioId,
+                    LocalDate.now(), // o LocalDateTime.now() si tu campo es LocalDateTime
+                    List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA)
+            );
+        }
+
+        public Optional<UsuarioDTO> findByIdActivo(Integer id) {
+            return usuarioRepository.findByIdAndEstado(id, EstadoUsuario.ACTIVO)
+                    .map(usuarioMapper::toDTO);
+        }
+
+        public boolean tieneReservasFuturasComoAnfitrion(Integer usuarioId) {
+            return reservaRepository.existsByAlojamiento_Anfitrion_Usuario_IdAndFechaCheckinGreaterThanEqualAndEstadoIn(
+                    usuarioId,
+                    LocalDate.now(), // o LocalDateTime.now()
+                    List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA)
+            );
+        }
     }

@@ -64,4 +64,7 @@ public interface UsuarioService {
     void quitarAnfitrion(Integer usuarioId);
     String actualizarFotoPerfil(Integer usuarioId, String nuevaUrlSegura); // guarda URL en BD
 
+    void eliminarCuenta(Integer userId);
+
+    UsuarioDTO obtenerPorIdActivo(Integer id);
 }

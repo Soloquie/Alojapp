@@ -97,4 +97,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
      */
     @Query("SELECT u FROM Usuario u WHERE u.fechaUltimaConexion < :fecha")
     List<Usuario> findUsuariosInactivos(@Param("fecha") LocalDateTime fecha);
+
+    /**
+     * Buscar el id del usuario en base al estado que tenga
+     */
+    Optional<Usuario> findByIdAndEstado(Integer id, EstadoUsuario estado);
 }

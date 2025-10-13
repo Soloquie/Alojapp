@@ -61,7 +61,7 @@ public class UsuarioServiceIMPL implements UsuarioService {
     @Transactional(readOnly = true)
     public UsuarioDTO obtenerPorId(Integer id) {
         return usuarioDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
     }
 
     @Override
@@ -310,5 +310,45 @@ public class UsuarioServiceIMPL implements UsuarioService {
         log.info("Foto de perfil actualizada. userId={}, anterior={}, nueva={}", usuarioId, anterior, nuevaUrlSegura);
         return nuevaUrlSegura;
     }
+
+    // UsuarioServiceIMPL.java
+
+    @Override
+    @Transactional(readOnly = true)
+    public UsuarioDTO obtenerPorIdActivo(Integer id) {
+        return usuarioDAO.findByIdActivo(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+    }
+
+    @Override
+    public void eliminarCuenta(Integer id) {
+        log.info("Eliminando (soft) usuario {}", id);
+
+        // 1) Asegurar existencia (activos o no)
+        Usuario usuario = usuarioDAO.findEntityById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+
+        // 2) Reglas de negocio mínimas (ajústalas a tu dominio):
+        // - No permitir eliminar si tiene reservas futuras como huésped
+        if (usuarioDAO.tieneReservasFuturasComoHuesped(id)) {
+            throw new IllegalStateException("No puedes eliminar la cuenta: tienes reservas futuras");
+        }
+        // - Si es anfitrión, no permitir eliminar si alguno de sus alojamientos tiene reservas futuras
+        if (usuarioDAO.esAnfitrion(id) && usuarioDAO.tieneReservasFuturasComoAnfitrion(id)) {
+            throw new IllegalStateException("No puedes eliminar la cuenta: tus alojamientos tienen reservas futuras");
+        }
+
+        // 3) Soft delete (estado INACTIVO o ELIMINADO)
+        boolean ok = usuarioDAO.desactivar(id);
+        if (!ok) {
+            throw new RuntimeException("No se pudo desactivar el usuario " + id);
+        }
+
+        // 4) (Opcional) revocar sesiones/tokens si manejas blacklist/refreshtokens
+        // tokenService.revokeAllForUser(id);
+
+        log.info("Usuario {} desactivado correctamente", id);
+    }
+
 
 }

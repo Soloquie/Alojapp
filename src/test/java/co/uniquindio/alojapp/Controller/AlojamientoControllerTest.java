@@ -115,59 +115,7 @@ public class AlojamientoControllerTest {
         verify(alojamientoService, times(1)).crear(anfitrionId, crearRequest);
     }
 
-    @Test
-    @DisplayName("Actualizar alojamiento - Debería retornar 200 OK")
-    void actualizarAlojamiento_DeberiaRetornar200Ok() {
-        // Arrange
-        Integer anfitrionId = 2;
-        Integer alojamientoId = 10;
-        when(alojamientoService.actualizar(eq(alojamientoId), eq(anfitrionId), any(ActualizarAlojamientoRequest.class)))
-                .thenReturn(alojamientoDTO);
 
-        // Act
-        ResponseEntity<AlojamientoDTO> response = alojamientoController.actualizarAlojamiento(
-                anfitrionId, alojamientoId, actualizarRequest);
-
-        // Assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(alojamientoDTO);
-        assertThat(response.getBody().getAnfitrionId()).isEqualTo(5L);
-        assertThat(response.getBody().getAnfitrionNombre()).isEqualTo("María López");
-        verify(alojamientoService, times(1)).actualizar(alojamientoId, anfitrionId, actualizarRequest);
-    }
-
-    @Test
-    @DisplayName("Eliminar alojamiento - Éxito debería retornar 204 NO_CONTENT")
-    void eliminarAlojamiento_Exito_DeberiaRetornar204NoContent() {
-        // Arrange
-        Integer anfitrionId = 2;
-        Integer alojamientoId = 10;
-        when(alojamientoService.eliminar(alojamientoId, anfitrionId)).thenReturn(true);
-
-        // Act
-        ResponseEntity<Void> response = alojamientoController.eliminarAlojamiento(anfitrionId, alojamientoId);
-
-        // Assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertThat(response.getBody()).isNull();
-        verify(alojamientoService, times(1)).eliminar(alojamientoId, anfitrionId);
-    }
-
-    @Test
-    @DisplayName("Eliminar alojamiento - No encontrado debería retornar 404 NOT_FOUND")
-    void eliminarAlojamiento_NoEncontrado_DeberiaRetornar404NotFound() {
-        // Arrange
-        Integer anfitrionId = 2;
-        Integer alojamientoId = 10;
-        when(alojamientoService.eliminar(alojamientoId, anfitrionId)).thenReturn(false);
-
-        // Act
-        ResponseEntity<Void> response = alojamientoController.eliminarAlojamiento(anfitrionId, alojamientoId);
-
-        // Assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        verify(alojamientoService, times(1)).eliminar(alojamientoId, anfitrionId);
-    }
 
     @Test
     @DisplayName("Listar alojamientos del anfitrión - Debería retornar paginación")

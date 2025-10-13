@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -150,4 +151,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
             @Param("fechaInicio") LocalDate fechaInicio,
             @Param("fechaFin") LocalDate fechaFin
     );
+
+    boolean existsByHuesped_IdAndFechaCheckinGreaterThanEqualAndEstadoIn(
+            Integer huespedId, LocalDate hoy, Collection<EstadoReserva> estados);
+
+    boolean existsByAlojamiento_Anfitrion_Usuario_IdAndFechaCheckinGreaterThanEqualAndEstadoIn(
+            Integer usuarioId, LocalDate hoy, Collection<EstadoReserva> estados);
 }
