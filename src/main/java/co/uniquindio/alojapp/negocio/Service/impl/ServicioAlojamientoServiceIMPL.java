@@ -2,9 +2,12 @@ package co.uniquindio.alojapp.negocio.Service.impl;
 
 import co.uniquindio.alojapp.negocio.DTO.ServicioAlojamientoDTO;
 import co.uniquindio.alojapp.negocio.Service.ServicioAlojamientoService;
+import co.uniquindio.alojapp.negocio.excepciones.ConflictoNegocioException;
 import co.uniquindio.alojapp.negocio.excepciones.ReglaNegocioException;
 import co.uniquindio.alojapp.negocio.excepciones.RecursoNoEncontradoException;
 import co.uniquindio.alojapp.persistencia.DAO.ServicioAlojamientoDAO;
+import co.uniquindio.alojapp.persistencia.Repository.ServicioAlojamientoRepository;
+import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,16 +22,19 @@ import java.util.List;
 public class ServicioAlojamientoServiceIMPL implements ServicioAlojamientoService {
 
     private final ServicioAlojamientoDAO servicioDAO;
+    private final ServicioAlojamientoRepository servicioAlojamientoRepository;
 
     @Override
     @Transactional
     public ServicioAlojamientoDTO crear(String nombre, String descripcion, String iconoUrl) {
+        if(servicioAlojamientoRepository.existsByNombre(nombre)){
+            throw new ConflictoNegocioException("Ya existe un servicio con ese nombre");
+        }
         try {
             log.info("Creando servicio de alojamiento: nombre='{}'", nombre);
             return servicioDAO.save(nombre, descripcion, iconoUrl);
         } catch (RuntimeException e) {
-            // El DAO lanza RuntimeException cuando hay duplicado por nombre
-            throw new ReglaNegocioException(e.getMessage());
+            throw new ConflictoNegocioException("Ya existe un servicio con ese nombre");
         }
     }
 
