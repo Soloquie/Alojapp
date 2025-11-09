@@ -36,9 +36,10 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/error"            // <- agrega esto
+                                "/error",
+                                "/api/recuperacion/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/alojamientos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/alojamientos").permitAll()
                         .anyRequest().authenticated()
                 )
 

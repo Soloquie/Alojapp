@@ -6,6 +6,7 @@ import co.uniquindio.alojapp.negocio.DTO.request.LoginRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroAnfitrionRequest;
 import co.uniquindio.alojapp.negocio.DTO.response.LoginResponse;
+import co.uniquindio.alojapp.negocio.Service.FotoPerfilService;
 import co.uniquindio.alojapp.negocio.Service.UsuarioService;
 import co.uniquindio.alojapp.negocio.Service.AnfitrionService;
 // la que te propuse
@@ -30,6 +31,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 
@@ -48,6 +50,7 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final UsuarioRepository usuarioRepository;
     private final JwtProperties jwtProps;
+    private final FotoPerfilService fotoPerfilService;
 
     // ====== LOGIN (placeholder: implementa tu JWT cuando lo tengas) ======
     @Operation(summary = "Iniciar sesión (JWT)")
@@ -130,6 +133,39 @@ public class AuthController {
 
         // Devuelvo el usuario creado; si tienes un AnfitrionDTO, también puedes retornarlo
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    @PostMapping(
+            value = "/registro-huesped",
+            consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(
+            summary = "Registrar nuevo huésped (multipart/form-data con foto opcional)",
+            description = "Envia la parte 'request' (JSON de RegistroUsuarioRequest) y opcionalmente la parte 'foto' (image/*)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Creado",
+                    content = @Content(schema = @Schema(implementation = UsuarioDTO.class))),
+            @ApiResponse(responseCode = "409", description = "Email duplicado"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    })
+    public ResponseEntity<UsuarioDTO> registrarHuespedMultipart(
+            @Valid @RequestPart("request") RegistroUsuarioRequest request,
+            @RequestPart(value = "foto", required = false) MultipartFile foto
+    ) throws Exception {
+
+        UsuarioDTO creado = usuarioService.registrar(request);
+
+        if (foto != null && !foto.isEmpty()) {
+            // Subir a Cloudinary
+            String url = fotoPerfilService.subirFotoPerfil(creado.getId(), foto);
+            // Guardar URL en el usuario (y opcionalmente eliminar foto anterior si existía)
+            usuarioService.actualizarFotoPerfil(creado.getId(), url);
+            // Reflejar en la respuesta
+            creado.setFotoPerfilUrl(url);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
     // ====== REFRESH TOKEN (placeholder) ======
