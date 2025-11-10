@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -137,7 +138,8 @@ public class AuthController {
 
     @PostMapping(
             value = "/registro-huesped",
-            consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+            consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Operation(
             summary = "Registrar nuevo huésped (multipart/form-data con foto opcional)",
