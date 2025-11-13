@@ -3,12 +3,17 @@ package co.uniquindio.alojapp.Controller;
 import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
 import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.CambiarPasswordRequest;
+import co.uniquindio.alojapp.negocio.DTO.request.RegistrarPerfilAnfitrionRequest;
+import co.uniquindio.alojapp.negocio.Service.AnfitrionService;
 import co.uniquindio.alojapp.negocio.Service.FotoPerfilService;
 import co.uniquindio.alojapp.negocio.Service.UsuarioService;
 import co.uniquindio.alojapp.negocio.excepciones.AccesoNoAutorizadoException;
 import co.uniquindio.alojapp.negocio.excepciones.BadRequestException;
 import co.uniquindio.alojapp.negocio.excepciones.RecursoNoEncontradoException;
+import co.uniquindio.alojapp.persistencia.DAO.AdministradorDAO;
+import co.uniquindio.alojapp.persistencia.Entity.Anfitrion;
 import co.uniquindio.alojapp.persistencia.Entity.Usuario;
+import co.uniquindio.alojapp.persistencia.Repository.AnfitrionRepository;
 import co.uniquindio.alojapp.persistencia.Repository.UsuarioRepository;
 import co.uniquindio.alojapp.seguridad.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +39,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -46,6 +52,9 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository;
     private final FotoPerfilService fotoPerfilService;
+    private final AnfitrionService anfitrionService;
+    private final AnfitrionRepository anfitrionRepository;
+
 
     // ----------------- helpers -----------------
     private String currentEmail() {
@@ -53,6 +62,25 @@ public class UsuarioController {
             Authentication a = SecurityContextHolder.getContext().getAuthentication();
             return (a != null) ? a.getName() : null;
         });
+    }
+
+    @PostMapping("/me/anfitrion")
+    public ResponseEntity<Void> convertirmeEnAnfitrion(@Valid @RequestBody RegistrarPerfilAnfitrionRequest req) {
+        String email = SecurityUtils.getEmailActual()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No autenticado"));
+
+        Integer usuarioId = usuarioRepository.findByEmailIgnoreCase(email)
+                .map(Usuario::getId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        anfitrionService.crearPerfil(
+                usuarioId,
+                req.getDescripcionPersonal(),
+                req.getDocumentosLegalesUrl(),
+                req.getFechaRegistro() != null ? req.getFechaRegistro() : LocalDate.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     private Integer currentUserId() {
@@ -90,6 +118,19 @@ public class UsuarioController {
         Integer userId = currentUserId();
         return ResponseEntity.ok(usuarioService.actualizarPerfil(userId, req));
     }
+
+    // Nuevo en tu controlador de anfitriones (o aquí mismo):
+    @GetMapping("/anfitrion/mi-id")
+    @Operation(summary = "Devuelve el ID de anfitrión del usuario autenticado")
+    public ResponseEntity<Map<String, Integer>> miAnfitrionId() {
+        Integer userId = currentUserId(); // ya lo tienes implementado
+        Integer anfitrionId = anfitrionRepository
+                .findByUsuarioId(userId)       // método del repo
+                .map(Anfitrion::getId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("El usuario no tiene perfil de anfitrión"));
+        return ResponseEntity.ok(Map.of("anfitrionId", anfitrionId));
+    }
+
 
     @PatchMapping("/me/password")
     @Operation(summary = "Cambiar mi contraseña")

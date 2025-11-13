@@ -42,4 +42,6 @@ public interface AlojamientoService {
     AlojamientoDTO actualizarDeUsuario(Integer usuarioId, Integer alojamientoId, ActualizarAlojamientoRequest request);
 
     boolean eliminarDeUsuario(Integer userId, Integer alojamientoId);
+
+    void actualizarPortada(Integer id, String url);
 }

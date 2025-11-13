@@ -6,6 +6,7 @@ import co.uniquindio.alojapp.negocio.DTO.request.BuscarAlojamientosRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.CrearAlojamientoRequest;
 import co.uniquindio.alojapp.negocio.DTO.response.PaginacionResponse;
 import co.uniquindio.alojapp.negocio.Service.AlojamientoService;
+import co.uniquindio.alojapp.negocio.excepciones.RecursoNoEncontradoException;
 import co.uniquindio.alojapp.persistencia.DAO.AlojamientoDAO;
 import co.uniquindio.alojapp.persistencia.Entity.Alojamiento;
 import co.uniquindio.alojapp.persistencia.Entity.Anfitrion;
@@ -116,6 +117,16 @@ public class AlojamientoServiceIMPL implements AlojamientoService {
     @Transactional
     public boolean eliminarDeUsuario(Integer usuarioId, Integer alojamientoId) {
         return alojamientoDAO.eliminarDeUsuario(usuarioId, alojamientoId);
+    }
+
+    @Override
+    @Transactional
+    public void actualizarPortada(Integer alojamientoId, String urlPortada) {
+        var ent = alojamientoRepository.findById(alojamientoId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Alojamiento no encontrado"));
+
+        ent.setImagenPrincipalUrl(urlPortada);
+        alojamientoRepository.save(ent);
     }
 
     @Override
