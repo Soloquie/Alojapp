@@ -12,8 +12,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -70,14 +73,16 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String,Object>> handleUnexpected(Exception ex) {
-        Map<String,Object> body = Map.of(
-                "timestamp", OffsetDateTime.now().toString(),
-                "status", 500,
-                "error", "Internal Server Error",
-                "message", ex.getMessage(),
-                "validation", null
-        );
+    public ResponseEntity<Map<String, Object>> handleUnexpected(Exception ex,
+                                                                HttpServletRequest request) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("error", "Error inesperado");
+        body.put("message", Objects.toString(ex.getMessage(), "Ocurrió un error en el servidor"));
+        body.put("path", request.getRequestURI());
+        body.put("timestamp", LocalDateTime.now());
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
 }

@@ -72,7 +72,6 @@ public class UsuarioController {
         Integer usuarioId = usuarioRepository.findByEmailIgnoreCase(email)
                 .map(Usuario::getId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-
         anfitrionService.crearPerfil(
                 usuarioId,
                 req.getDescripcionPersonal(),
@@ -119,7 +118,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.actualizarPerfil(userId, req));
     }
 
-    // Nuevo en tu controlador de anfitriones (o aquí mismo):
     @GetMapping("/anfitrion/mi-id")
     @Operation(summary = "Devuelve el ID de anfitrión del usuario autenticado")
     public ResponseEntity<Map<String, Integer>> miAnfitrionId() {

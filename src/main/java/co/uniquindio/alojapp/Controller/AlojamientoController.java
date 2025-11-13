@@ -206,6 +206,7 @@ public class AlojamientoController {
     }
 
 
+
     @PostMapping(
             value = "/anfitriones/{anfitrionId}/alojamientos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -224,7 +225,7 @@ public class AlojamientoController {
             @RequestPart(value = "descripciones", required = false) List<String> descripciones
     ) {
         request.setImagenPrincipalUrl("xd");
-        AlojamientoDTO dto = alojamientoService.crear(anfitrionId, request);
+        AlojamientoDTO dto = alojamientoService.crear(currentUserId(), request);
 
         // 2) Si enviaron imágenes, súbelas a Cloudinary y persístelas
         if (imagenes != null && !imagenes.isEmpty()) {

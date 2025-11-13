@@ -57,10 +57,6 @@ public class ComentarioDAO {
             throw new RuntimeException("No tienes permiso para comentar esta reserva");
         }
 
-        // RN16: Validar que la reserva esté completada
-        if (reserva.getEstado() != co.uniquindio.alojapp.persistencia.Entity.Enum.EstadoReserva.COMPLETADA) {
-            throw new RuntimeException("Solo puedes comentar reservas completadas");
-        }
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

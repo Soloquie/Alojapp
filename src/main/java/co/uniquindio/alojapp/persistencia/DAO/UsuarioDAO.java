@@ -263,6 +263,7 @@
             an.setFechaRegistroAnfitrion(((fechaRegistro != null) ? fechaRegistro : LocalDate.now()).atStartOfDay());
             an.setVerificado(false); // por defecto
 
+
             anfitrionRepository.save(an);
             return true;
         }
