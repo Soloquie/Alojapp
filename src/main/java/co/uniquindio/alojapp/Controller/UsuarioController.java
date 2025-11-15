@@ -106,17 +106,35 @@ public class UsuarioController {
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/me")
-    @Operation(summary = "Actualizar mi perfil")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Perfil actualizado"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content),
-            @ApiResponse(responseCode = "401", description = "No autenticado", content = @Content)
-    })
+    // Solo JSON (sin foto)
+    @PutMapping(
+            value = "/me",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<UsuarioDTO> actualizarPerfil(@Valid @RequestBody ActualizarPerfilRequest req) {
         Integer userId = currentUserId();
         return ResponseEntity.ok(usuarioService.actualizarPerfil(userId, req));
     }
+
+    // JSON + foto (multipart)
+    @PutMapping(
+            value = "/me",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<UsuarioDTO> actualizarPerfilConFoto(
+            @RequestPart("perfil") @Valid ActualizarPerfilRequest req,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) throws IOException {
+        Integer userId = currentUserId();
+        if (file != null && !file.isEmpty()) {
+            String secureUrl = fotoPerfilService.subirFotoPerfil(userId, file);
+            req.setFotoPerfilUrl(secureUrl);
+        }
+        return ResponseEntity.ok(usuarioService.actualizarPerfil(userId, req));
+    }
+
 
     @GetMapping("/anfitrion/mi-id")
     @Operation(summary = "Devuelve el ID de anfitrión del usuario autenticado")

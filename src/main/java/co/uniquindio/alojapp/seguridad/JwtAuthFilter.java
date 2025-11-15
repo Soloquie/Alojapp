@@ -55,7 +55,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } else {
-                    // token válido sintácticamente pero no pasa validación
                     entryPoint.commenceWithCode(request, response, "TOKEN_INVALID", "El token JWT no es válido");
                     return;
                 }

@@ -4,6 +4,8 @@ import co.uniquindio.alojapp.negocio.DTO.UsuarioDTO;
 import co.uniquindio.alojapp.negocio.DTO.request.ActualizarPerfilRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistrarPerfilAnfitrionRequest;
 import co.uniquindio.alojapp.negocio.DTO.request.RegistroUsuarioRequest;
+import co.uniquindio.alojapp.negocio.Service.FotoPerfilService;
+import co.uniquindio.alojapp.negocio.Service.ImagenService;
 import co.uniquindio.alojapp.negocio.Service.UsuarioService;
 import co.uniquindio.alojapp.negocio.excepciones.RecursoNoEncontradoException;
 import co.uniquindio.alojapp.persistencia.DAO.UsuarioDAO;
@@ -86,7 +88,6 @@ public class UsuarioServiceIMPL implements UsuarioService {
 
         // Validar campos presentes
         validarActualizacionPerfil(request);
-
         return usuarioDAO.actualizarPerfil(id, request)
                 .orElseThrow(() -> new RuntimeException("No se pudo actualizar el perfil del usuario " + id));
     }
