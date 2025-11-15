@@ -62,12 +62,18 @@ public class CodigoRecuperacionServiceIMPL implements CodigoRecuperacionService 
 
         // Anti-spam: cooldown entre generaciones
         var historial = codigoDAO.findByUsuario(usuario.getId());
+
         if (!historial.isEmpty()) {
-            var ultimo = historial.getFirst(); // vienen desc por fecha_expiracion
-            // Para saber cuándo se creó, inferimos a partir de la expiración (exp = creado + 15m)
-            // Si cambias la ventana de expiración, actualiza este cálculo.
+
+            // Java 17 no tiene .getFirst(), así que usamos get(0)
+            var ultimo = historial.get(0); // vienen ordenados desc por fecha_expiracion
+
+            // Inferimos fecha aproximada de creación: exp = creado + 15 min
             LocalDateTime creadoAprox = ultimo.getFechaExpiracion().minusMinutes(15);
-            if (Duration.between(creadoAprox, LocalDateTime.now()).getSeconds() < cooldownSegundos) {
+
+            long segundosDesdeCreacion = Duration.between(creadoAprox, LocalDateTime.now()).getSeconds();
+
+            if (segundosDesdeCreacion < cooldownSegundos) {
                 throw new IllegalStateException("Solicitud muy frecuente. Intenta nuevamente en unos segundos.");
             }
         }
@@ -78,9 +84,12 @@ public class CodigoRecuperacionServiceIMPL implements CodigoRecuperacionService 
         // Enviar correo real
         enviarCorreoCodigo(usuario.getNombre(), email, dto.getCodigo());
 
-        log.info("Código de recuperación generado y enviado. userId={}, email={}", usuario.getId(), email);
+        log.info("Código de recuperación generado y enviado. userId={}, email={}",
+                usuario.getId(), email);
+
         return dto;
     }
+
 
     @Override
     public boolean validarCodigo(Integer usuarioId, String codigo) {
